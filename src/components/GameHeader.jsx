@@ -1,7 +1,14 @@
-export default function GameHeader({ level, currency, prestige }) {
+export default function GameHeader({ level, currency, prestige, onMenuClick }) {
   return (
     <div className="bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-600 px-6 py-4">
       <div className="flex items-center justify-between max-w-6xl mx-auto">
+        <button
+          onClick={onMenuClick}
+          className="text-2xl hover:scale-110 transition-transform absolute left-4"
+          title="Menu"
+        >
+          ☰
+        </button>
         <div className="flex items-center gap-8">
           <div className="text-center">
             <div className="text-xs text-slate-400 uppercase tracking-wide">Level</div>

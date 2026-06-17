@@ -6,11 +6,17 @@ import GameHeader from './GameHeader'
 import GameArea from './GameArea'
 import HeroShop from './HeroShop'
 import SkinShop from './SkinShop'
+import MenuModal from './MenuModal'
+import BattlePass from './BattlePass'
+import EventsLeaderboard from './EventsLeaderboard'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
   const [showShop, setShowShop] = useState(false)
   const [showSkins, setShowSkins] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const [showBattlePass, setShowBattlePass] = useState(false)
+  const [showEvents, setShowEvents] = useState(false)
   const [floatingDamage, setFloatingDamage] = useState([])
 
   // Auto-unlock skins based on level
@@ -86,7 +92,12 @@ export default function GameScreen() {
   return (
     <div className="w-full h-full flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <GameHeader level={state.level} currency={Math.floor(state.currency)} prestige={state.prestige} />
+      <GameHeader
+        level={state.level}
+        currency={Math.floor(state.currency)}
+        prestige={state.prestige}
+        onMenuClick={() => setShowMenu(true)}
+      />
 
       {/* Main Game Area */}
       <div className="flex-1 flex flex-col items-center justify-center px-4">
@@ -131,6 +142,29 @@ export default function GameScreen() {
 
       {/* Skins Modal */}
       {showSkins && <SkinShop state={state} dispatch={dispatch} onClose={() => setShowSkins(false)} />}
+
+      {/* Menu Modal */}
+      {showMenu && (
+        <MenuModal
+          onSelectBattlePass={() => { setShowMenu(false); setShowBattlePass(true); }}
+          onSelectEvents={() => { setShowMenu(false); setShowEvents(true); }}
+          onClose={() => setShowMenu(false)}
+        />
+      )}
+
+      {/* Battle Pass Modal */}
+      {showBattlePass && (
+        <BattlePass currentLevel={state.level} onClose={() => setShowBattlePass(false)} />
+      )}
+
+      {/* Events Leaderboard Modal */}
+      {showEvents && (
+        <EventsLeaderboard
+          playerLevel={state.level}
+          playerScore={Math.floor(state.totalDamage)}
+          onClose={() => setShowEvents(false)}
+        />
+      )}
     </div>
   )
 }
