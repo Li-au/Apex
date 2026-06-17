@@ -70,7 +70,7 @@ export default function HeroShop({ state, dispatch, onClose }) {
                     Owned: <span className="text-amber-400">{count}</span>
                   </div>
                   <div className="text-xs text-slate-500 mt-1">
-                    +{(hero.baseCost * 0.15).toFixed(1)} DPS each
+                    +1 DPS each (simple & powerful!)
                   </div>
                 </div>
               </button>

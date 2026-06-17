@@ -41,13 +41,12 @@ export default function GameScreen() {
     }
   }, [state.level])
 
-  // Calculate DPS from heroes
+  // Calculate DPS from heroes - Each hero gives +1 DPS
   const calculateDPS = () => {
-    const heroCosts = [25, 150, 750, 5000, 35000, 250000, 2000000, 20000000]
     let totalDPS = 0
     Object.entries(state.heroCount).forEach(([heroId, count]) => {
-      const dps = heroCosts[parseInt(heroId)] * 0.15 * state.prestigeMultiplier  // Reduced from 0.5 to 0.15
-      totalDPS += dps * count
+      // Simple: each hero = +1 DPS (× prestige multiplier)
+      totalDPS += count * state.prestigeMultiplier
     })
     return totalDPS
   }
