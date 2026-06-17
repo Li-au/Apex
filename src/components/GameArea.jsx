@@ -1,16 +1,23 @@
 import { useRef } from 'react'
+import { getLevelData } from '../data/levels'
 
 export default function GameArea({ level, bossHealth, maxHealth, onTap, floatingDamage }) {
   const tapZoneRef = useRef(null)
   const healthPercent = (bossHealth / maxHealth) * 100
+  const levelData = getLevelData(level)
 
-  // Get boss color based on level
-  const getBossColor = () => {
-    if (level <= 10) return 'from-orange-500 to-orange-600'
-    if (level <= 25) return 'from-red-500 to-red-600'
-    if (level <= 40) return 'from-purple-600 to-purple-700'
-    return 'from-indigo-600 to-indigo-900'
+  // Get boss color and emoji based on variant
+  const getBossStyle = () => {
+    const variants = {
+      common: { color: 'from-orange-500 to-orange-600', emoji: '👹', name: 'Goblin' },
+      rare: { color: 'from-blue-500 to-blue-600', emoji: '🧟', name: 'Zombie' },
+      epic: { color: 'from-purple-600 to-purple-700', emoji: '🧛', name: 'Vampire' },
+      legendary: { color: 'from-indigo-600 to-indigo-900', emoji: '👹', name: 'Demon' },
+    }
+    return variants[levelData?.variant || 'common']
   }
+
+  const bossStyle = getBossStyle()
 
   const handleTap = (e) => {
     const rect = tapZoneRef.current.getBoundingClientRect()
@@ -23,13 +30,16 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
     <div className="w-full max-w-2xl flex flex-col items-center justify-center gap-6">
       {/* Boss Display */}
       <div className="text-6xl animate-bounce">
-        {level <= 10 ? '👹' : level <= 25 ? '👿' : level <= 40 ? '🧛' : '👹'}
+        {bossStyle.emoji}
       </div>
 
       {/* Boss Name and Level */}
       <div className="text-center">
-        <div className="text-sm text-slate-400 uppercase tracking-wider">Boss</div>
-        <div className="text-2xl font-bold text-white">Level {level} Boss</div>
+        <div className="text-sm text-slate-400 uppercase tracking-wider">Level {level} Boss</div>
+        <div className="text-2xl font-bold text-white">{bossStyle.name}</div>
+        <div className="text-xs text-slate-500 mt-1">
+          {levelData?.milestone ? '⭐ Milestone Boss!' : ''}
+        </div>
       </div>
 
       {/* Health Bar */}
@@ -42,7 +52,7 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
         </div>
         <div className="w-full bg-slate-700 rounded-full h-8 overflow-hidden shadow-inner border-2 border-slate-600">
           <div
-            className={`h-full bg-gradient-to-r ${getBossColor()} transition-all duration-100`}
+            className={`h-full bg-gradient-to-r ${bossStyle.color} transition-all duration-100`}
             style={{ width: `${healthPercent}%` }}
           />
         </div>
@@ -79,6 +89,28 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
           </div>
         ))}
       </button>
+
+      {/* Next Level Preview */}
+      {level < 50 && (
+        <div className="w-full px-4 bg-slate-700 bg-opacity-50 rounded-lg p-3 mt-4">
+          <div className="text-xs text-slate-400 uppercase mb-2">Next Level</div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">
+                {level <= 10 ? '🧟' : level <= 25 ? '🧛' : level <= 40 ? '👹' : '⚡'}
+              </div>
+              <div>
+                <div className="font-bold text-white">Level {level + 1} Preview</div>
+                <div className="text-xs text-slate-500">Health: {getLevelData(level + 1)?.health || 0}</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-semibold text-yellow-400">+{getLevelData(level + 1)?.reward || 0}</div>
+              <div className="text-xs text-slate-500">coins</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Info Text */}
       <div className="text-center text-slate-400 text-sm mt-4">

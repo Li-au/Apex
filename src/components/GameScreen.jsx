@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useGameState } from '../hooks/useGameState'
+import { getLevelData, LEVELS } from '../data/levels'
 import GameHeader from './GameHeader'
 import GameArea from './GameArea'
 import HeroShop from './HeroShop'
@@ -8,6 +9,19 @@ export default function GameScreen() {
   const [state, dispatch] = useGameState()
   const [showShop, setShowShop] = useState(false)
   const [floatingDamage, setFloatingDamage] = useState([])
+
+  // Get current level data and ensure boss health is correct
+  const currentLevelData = getLevelData(state.level)
+
+  // Sync boss health with level data on level change
+  useEffect(() => {
+    if (currentLevelData && state.bossHealth > currentLevelData.health) {
+      dispatch({
+        type: 'TAP',
+        payload: -(state.bossHealth - currentLevelData.health)
+      })
+    }
+  }, [state.level])
 
   // Calculate DPS from heroes
   const calculateDPS = () => {
@@ -35,7 +49,8 @@ export default function GameScreen() {
   // Check for level completion
   useEffect(() => {
     if (state.bossHealth === 0 && state.level < 50) {
-      const reward = Math.floor(100 * Math.pow(1.1, state.level))
+      const levelData = getLevelData(state.level)
+      const reward = levelData.reward
       dispatch({ type: 'ADD_CURRENCY', payload: reward })
       setTimeout(() => {
         dispatch({ type: 'NEXT_LEVEL' })
