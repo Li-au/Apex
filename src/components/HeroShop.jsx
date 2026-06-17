@@ -1,12 +1,12 @@
 const HEROES = [
-  { id: 0, name: 'Archer', icon: '🏹', baseCost: 10 },
-  { id: 1, name: 'Knight', icon: '⚔️', baseCost: 50 },
-  { id: 2, name: 'Mage', icon: '🧙', baseCost: 200 },
-  { id: 3, name: 'Dragon', icon: '🐉', baseCost: 1000 },
-  { id: 4, name: 'Phoenix', icon: '🔥', baseCost: 5000 },
-  { id: 5, name: 'Titan', icon: '👹', baseCost: 25000 },
-  { id: 6, name: 'God', icon: '⚡', baseCost: 100000 },
-  { id: 7, name: 'Ultimate', icon: '🌟', baseCost: 500000 },
+  { id: 0, name: 'Archer', icon: '🏹', baseCost: 25 },  // Increased from 10
+  { id: 1, name: 'Knight', icon: '⚔️', baseCost: 150 },  // Increased from 50
+  { id: 2, name: 'Mage', icon: '🧙', baseCost: 750 },  // Increased from 200
+  { id: 3, name: 'Dragon', icon: '🐉', baseCost: 5000 },  // Increased from 1000
+  { id: 4, name: 'Phoenix', icon: '🔥', baseCost: 35000 },  // Increased from 5000
+  { id: 5, name: 'Titan', icon: '👹', baseCost: 250000 },  // Increased from 25000
+  { id: 6, name: 'God', icon: '⚡', baseCost: 2000000 },  // Increased from 100000
+  { id: 7, name: 'Ultimate', icon: '🌟', baseCost: 20000000 },  // Increased from 500000
 ]
 
 export default function HeroShop({ state, dispatch, onClose }) {
@@ -70,7 +70,7 @@ export default function HeroShop({ state, dispatch, onClose }) {
                     Owned: <span className="text-amber-400">{count}</span>
                   </div>
                   <div className="text-xs text-slate-500 mt-1">
-                    +{(hero.baseCost * 0.5).toFixed(1)} DPS each
+                    +{(hero.baseCost * 0.15).toFixed(1)} DPS each
                   </div>
                 </div>
               </button>

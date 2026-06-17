@@ -43,10 +43,10 @@ export default function GameScreen() {
 
   // Calculate DPS from heroes
   const calculateDPS = () => {
-    const heroCosts = [10, 50, 200, 1000, 5000, 25000, 100000, 500000]
+    const heroCosts = [25, 150, 750, 5000, 35000, 250000, 2000000, 20000000]
     let totalDPS = 0
     Object.entries(state.heroCount).forEach(([heroId, count]) => {
-      const dps = heroCosts[parseInt(heroId)] * 0.5 * state.prestigeMultiplier
+      const dps = heroCosts[parseInt(heroId)] * 0.15 * state.prestigeMultiplier  // Reduced from 0.5 to 0.15
       totalDPS += dps * count
     })
     return totalDPS
