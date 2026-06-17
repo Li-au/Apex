@@ -1,0 +1,10 @@
+{
+  "track_id": "apex_week1_20260617",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-06-17T16:00:00Z",
+  "updated_at": "2026-06-17T16:00:00Z",
+  "description": "APEX Week 1: Build a complete clicker game MVP with core mechanics, progression, cosmetics, battle pass, and prestige system",
+  "priority": "high",
+  "tags": ["game", "clicker", "monetizable", "week1", "mvp"]
+}
