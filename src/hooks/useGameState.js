@@ -6,8 +6,10 @@ const INITIAL_STATE = {
   maxHealth: 100,
   totalDamage: 0,
   currency: 0,
+  gems: 0,
   heroes: [],
   heroCount: {},
+  heroSpeed: {}, // Speed multiplier for each hero (1.0 = 1x, 1.5 = 1.5x, etc)
   prestige: 0,
   prestigeMultiplier: 1,
   activeSkin: 0,
@@ -52,7 +54,9 @@ const gameReducer = (state, action) => {
         maxHealth: 100,
         totalDamage: 0,
         currency: 0,
+        gems: 0,  // Reset gems on prestige
         heroCount: {},
+        heroSpeed: {},  // Reset all hero speeds on prestige
         prestige: state.prestige + 1,
         prestigeMultiplier: 1 + state.prestige * 0.5,
       }
@@ -66,6 +70,24 @@ const gameReducer = (state, action) => {
         ? state.unlockedSkins
         : [...state.unlockedSkins, skinId]
       return { ...state, unlockedSkins: unlockedSkins.sort((a, b) => a - b) }
+
+    case 'ADD_GEMS':
+      return { ...state, gems: state.gems + action.payload }
+
+    case 'UPGRADE_HERO_SPEED':
+      const heroId = action.payload
+      const cost = action.cost
+      if (state.gems >= cost) {
+        return {
+          ...state,
+          gems: state.gems - cost,
+          heroSpeed: {
+            ...state.heroSpeed,
+            [heroId]: (state.heroSpeed[heroId] || 1.0) + 0.1
+          }
+        }
+      }
+      return state
 
     case 'LOAD_GAME':
       return action.payload

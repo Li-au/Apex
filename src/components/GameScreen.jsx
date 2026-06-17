@@ -6,6 +6,7 @@ import GameHeader from './GameHeader'
 import GameArea from './GameArea'
 import HeroShop from './HeroShop'
 import SkinShop from './SkinShop'
+import HeroUpgrades from './HeroUpgrades'
 import MenuModal from './MenuModal'
 import BattlePass from './BattlePass'
 import EventsLeaderboard from './EventsLeaderboard'
@@ -14,6 +15,7 @@ export default function GameScreen() {
   const [state, dispatch] = useGameState()
   const [showShop, setShowShop] = useState(false)
   const [showSkins, setShowSkins] = useState(false)
+  const [showUpgrades, setShowUpgrades] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const [showBattlePass, setShowBattlePass] = useState(false)
   const [showEvents, setShowEvents] = useState(false)
@@ -41,12 +43,13 @@ export default function GameScreen() {
     }
   }, [state.level])
 
-  // Calculate DPS from heroes - Each hero gives +1 DPS
+  // Calculate DPS from heroes - Each hero gives +1 DPS × speed multiplier
   const calculateDPS = () => {
     let totalDPS = 0
     Object.entries(state.heroCount).forEach(([heroId, count]) => {
-      // Simple: each hero = +1 DPS (× prestige multiplier)
-      totalDPS += count * state.prestigeMultiplier
+      const speedMultiplier = state.heroSpeed[heroId] || 1.0
+      // Each hero = +1 DPS × speed multiplier × prestige multiplier
+      totalDPS += count * speedMultiplier * state.prestigeMultiplier
     })
     return totalDPS
   }
@@ -68,7 +71,9 @@ export default function GameScreen() {
     if (state.bossHealth === 0 && state.level < 50) {
       const levelData = getLevelData(state.level)
       const reward = levelData.reward
+      const gems = 10  // Reward 10 gems per boss
       dispatch({ type: 'ADD_CURRENCY', payload: reward })
+      dispatch({ type: 'ADD_GEMS', payload: gems })
       setTimeout(() => {
         dispatch({ type: 'NEXT_LEVEL' })
       }, 1000)
@@ -94,6 +99,7 @@ export default function GameScreen() {
       <GameHeader
         level={state.level}
         currency={Math.floor(state.currency)}
+        gems={state.gems}
         prestige={state.prestige}
         onMenuClick={() => setShowMenu(true)}
       />
@@ -111,18 +117,29 @@ export default function GameScreen() {
       </div>
 
       {/* Bottom Controls */}
-      <div className="bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid grid-cols-3 gap-3">
+      <div className="bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid grid-cols-4 gap-2">
         <button
           onClick={() => setShowShop(!showShop)}
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 px-2 rounded-lg transition-all transform hover:scale-105 text-sm"
+          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
         >
-          🛍️ Heroes
+          🛍️ Buy
+        </button>
+        <button
+          onClick={() => setShowUpgrades(!showUpgrades)}
+          className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs relative"
+        >
+          ⚡ Upgrade
+          {state.gems > 0 && (
+            <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              💎
+            </div>
+          )}
         </button>
         <button
           onClick={() => setShowSkins(!showSkins)}
-          className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-3 px-2 rounded-lg transition-all transform hover:scale-105 text-sm"
+          className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
         >
-          ✨ Skins ({state.unlockedSkins.length})
+          ✨ Skins
         </button>
         <button
           onClick={() => {
@@ -130,7 +147,7 @@ export default function GameScreen() {
               dispatch({ type: 'PRESTIGE' })
             }
           }}
-          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 px-2 rounded-lg transition-all transform hover:scale-105 text-sm"
+          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
         >
           Prestige x{state.prestige}
         </button>
@@ -138,6 +155,9 @@ export default function GameScreen() {
 
       {/* Shop Modal */}
       {showShop && <HeroShop state={state} dispatch={dispatch} onClose={() => setShowShop(false)} />}
+
+      {/* Hero Upgrades Modal */}
+      {showUpgrades && <HeroUpgrades state={state} dispatch={dispatch} onClose={() => setShowUpgrades(false)} />}
 
       {/* Skins Modal */}
       {showSkins && <SkinShop state={state} dispatch={dispatch} onClose={() => setShowSkins(false)} />}
