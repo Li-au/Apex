@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { getLevelData } from '../data/levels'
+import { SKINS } from '../data/skins'
 
-export default function GameArea({ level, bossHealth, maxHealth, onTap, floatingDamage }) {
+export default function GameArea({ level, bossHealth, maxHealth, onTap, floatingDamage, activeSkin }) {
   const tapZoneRef = useRef(null)
   const healthPercent = (bossHealth / maxHealth) * 100
   const levelData = getLevelData(level)
@@ -26,11 +27,18 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
     onTap(x, y)
   }
 
+  const activeSkinData = SKINS.find(s => s.id === activeSkin) || SKINS[0]
+
   return (
     <div className="w-full max-w-2xl flex flex-col items-center justify-center gap-6">
       {/* Boss Display */}
       <div className="text-6xl animate-bounce">
         {bossStyle.emoji}
+      </div>
+
+      {/* Active Skin Display */}
+      <div className="text-5xl">
+        {activeSkinData.emoji}
       </div>
 
       {/* Boss Name and Level */}

@@ -10,6 +10,8 @@ const INITIAL_STATE = {
   heroCount: {},
   prestige: 0,
   prestigeMultiplier: 1,
+  activeSkin: 0,
+  unlockedSkins: [0],
 }
 
 const gameReducer = (state, action) => {
@@ -54,6 +56,16 @@ const gameReducer = (state, action) => {
         prestige: state.prestige + 1,
         prestigeMultiplier: 1 + state.prestige * 0.5,
       }
+
+    case 'SELECT_SKIN':
+      return { ...state, activeSkin: action.payload }
+
+    case 'UNLOCK_SKIN':
+      const skinId = action.payload
+      const unlockedSkins = state.unlockedSkins.includes(skinId)
+        ? state.unlockedSkins
+        : [...state.unlockedSkins, skinId]
+      return { ...state, unlockedSkins: unlockedSkins.sort((a, b) => a - b) }
 
     case 'LOAD_GAME':
       return action.payload

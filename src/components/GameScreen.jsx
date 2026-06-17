@@ -1,14 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { getLevelData, LEVELS } from '../data/levels'
+import { SKINS } from '../data/skins'
 import GameHeader from './GameHeader'
 import GameArea from './GameArea'
 import HeroShop from './HeroShop'
+import SkinShop from './SkinShop'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
   const [showShop, setShowShop] = useState(false)
+  const [showSkins, setShowSkins] = useState(false)
   const [floatingDamage, setFloatingDamage] = useState([])
+
+  // Auto-unlock skins based on level
+  useEffect(() => {
+    SKINS.forEach(skin => {
+      if (!state.unlockedSkins.includes(skin.id) && state.level >= (skin.unlockLevel || 999)) {
+        dispatch({ type: 'UNLOCK_SKIN', payload: skin.id })
+      }
+    })
+  }, [state.level])
 
   // Get current level data and ensure boss health is correct
   const currentLevelData = getLevelData(state.level)
@@ -84,16 +96,23 @@ export default function GameScreen() {
           maxHealth={state.maxHealth}
           onTap={handleTap}
           floatingDamage={floatingDamage}
+          activeSkin={state.activeSkin}
         />
       </div>
 
       {/* Bottom Controls */}
-      <div className="bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 flex gap-3">
+      <div className="bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid grid-cols-3 gap-3">
         <button
           onClick={() => setShowShop(!showShop)}
-          className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105"
+          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 px-2 rounded-lg transition-all transform hover:scale-105 text-sm"
         >
-          🛍️ Shop ({Object.values(state.heroCount).reduce((a, b) => a + b, 0)} heroes)
+          🛍️ Heroes
+        </button>
+        <button
+          onClick={() => setShowSkins(!showSkins)}
+          className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-3 px-2 rounded-lg transition-all transform hover:scale-105 text-sm"
+        >
+          ✨ Skins ({state.unlockedSkins.length})
         </button>
         <button
           onClick={() => {
@@ -101,14 +120,17 @@ export default function GameScreen() {
               dispatch({ type: 'PRESTIGE' })
             }
           }}
-          className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105"
+          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-3 px-2 rounded-lg transition-all transform hover:scale-105 text-sm"
         >
-          ✨ Prestige (x{state.prestige})
+          Prestige x{state.prestige}
         </button>
       </div>
 
       {/* Shop Modal */}
       {showShop && <HeroShop state={state} dispatch={dispatch} onClose={() => setShowShop(false)} />}
+
+      {/* Skins Modal */}
+      {showSkins && <SkinShop state={state} dispatch={dispatch} onClose={() => setShowSkins(false)} />}
     </div>
   )
 }
