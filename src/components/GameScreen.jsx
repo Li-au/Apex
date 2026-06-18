@@ -13,6 +13,7 @@ import BattlePass from './BattlePass'
 import EventsLeaderboard from './EventsLeaderboard'
 import DailyQuests from './DailyQuests'
 import TalentTree from './TalentTree'
+import StatsPanel from './StatsPanel'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
@@ -24,6 +25,7 @@ export default function GameScreen() {
   const [showEvents, setShowEvents] = useState(false)
   const [showQuests, setShowQuests] = useState(false)
   const [showTalents, setShowTalents] = useState(false)
+  const [showStats, setShowStats] = useState(false)
   const [floatingDamage, setFloatingDamage] = useState([])
 
   // Auto-unlock skins based on level
@@ -210,9 +212,13 @@ export default function GameScreen() {
       {/* Talent Tree Modal */}
       {showTalents && <TalentTree state={state} dispatch={dispatch} onClose={() => setShowTalents(false)} />}
 
+      {/* Stats Panel Modal */}
+      {showStats && <StatsPanel state={state} onClose={() => setShowStats(false)} />}
+
       {/* Menu Modal */}
       {showMenu && (
         <MenuModal
+          onSelectStats={() => { setShowMenu(false); setShowStats(true); }}
           onSelectBattlePass={() => { setShowMenu(false); setShowBattlePass(true); }}
           onSelectEvents={() => { setShowMenu(false); setShowEvents(true); }}
           onClose={() => setShowMenu(false)}

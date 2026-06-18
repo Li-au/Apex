@@ -1,5 +1,11 @@
-export default function MenuModal({ onSelectBattlePass, onSelectEvents, onClose }) {
+export default function MenuModal({ onSelectBattlePass, onSelectEvents, onSelectStats, onClose }) {
   const menuItems = [
+    {
+      id: 'stats',
+      title: '📊 Statistics',
+      description: 'View your progress and stats',
+      onClick: onSelectStats,
+    },
     {
       id: 'battlepass',
       title: '⭐ Battle Pass',
