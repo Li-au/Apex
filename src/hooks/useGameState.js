@@ -9,11 +9,14 @@ const INITIAL_STATE = {
   gems: 0,
   heroes: [],
   heroCount: {},
-  heroSpeed: {}, // Speed multiplier for each hero (1.0 = 1x, 1.5 = 1.5x, etc)
+  heroSpeed: {},
   prestige: 0,
   prestigeMultiplier: 1,
+  ascensions: 0,  // Number of times ascended (permanent multiplier)
+  ascensionMultiplier: 1,  // Permanent multiplier from ascensions
   activeSkin: 0,
   unlockedSkins: [0],
+  achievements: [],  // Track completed achievements
 }
 
 const gameReducer = (state, action) => {
@@ -37,7 +40,7 @@ const gameReducer = (state, action) => {
         maxHealth: newMaxHealth,
       }
 
-    case 'BUY_HERO':
+    case 'BUY_HERO': {
       const heroId = action.payload
       const count = state.heroCount[heroId] || 0
       return {
@@ -45,6 +48,7 @@ const gameReducer = (state, action) => {
         heroCount: { ...state.heroCount, [heroId]: count + 1 },
         currency: state.currency - action.heroCost,
       }
+    }
 
     case 'PRESTIGE':
       return {
@@ -54,11 +58,29 @@ const gameReducer = (state, action) => {
         maxHealth: 100,
         totalDamage: 0,
         currency: 0,
-        gems: 0,  // Reset gems on prestige
+        gems: 0,
         heroCount: {},
-        heroSpeed: {},  // Reset all hero speeds on prestige
+        heroSpeed: {},
         prestige: state.prestige + 1,
         prestigeMultiplier: 1 + state.prestige * 0.5,
+      }
+
+    case 'ASCEND':
+      // Ultimate reset with PERMANENT bonuses
+      return {
+        ...state,
+        level: 1,
+        bossHealth: 100,
+        maxHealth: 100,
+        totalDamage: 0,
+        currency: 0,
+        gems: 0,
+        heroCount: {},
+        heroSpeed: {},
+        prestige: 0,
+        prestigeMultiplier: 1,
+        ascensions: state.ascensions + 1,
+        ascensionMultiplier: state.ascensionMultiplier * 1.5,  // +50% permanent bonus
       }
 
     case 'SELECT_SKIN':
@@ -74,7 +96,7 @@ const gameReducer = (state, action) => {
     case 'ADD_GEMS':
       return { ...state, gems: state.gems + action.payload }
 
-    case 'UPGRADE_HERO_SPEED':
+    case 'UPGRADE_HERO_SPEED': {
       const heroId = action.payload
       const cost = action.cost
       if (state.gems >= cost) {
@@ -88,6 +110,7 @@ const gameReducer = (state, action) => {
         }
       }
       return state
+    }
 
     case 'LOAD_GAME':
       return action.payload

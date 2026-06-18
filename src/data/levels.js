@@ -1,28 +1,36 @@
-// Generate 50 levels with exponential difficulty scaling
+// Generate 200 levels with exponential difficulty scaling - VERY LONG GAME
 export function generateLevels() {
   const levels = []
 
-  for (let i = 1; i <= 50; i++) {
-    // Exponential health scaling - INCREASED DIFFICULTY
-    const baseHealth = 150  // Increased from 100
-    const healthMultiplier = Math.pow(1.25, i - 1)  // Increased from 1.15
+  for (let i = 1; i <= 200; i++) {
+    // Exponential health scaling - VERY HARD
+    const baseHealth = 200
+    const healthMultiplier = Math.pow(1.18, i - 1)  // Increased from 1.25 - STEEPER
     const health = Math.floor(baseHealth * healthMultiplier)
 
     // Determine boss visual variant based on level
     let variant = 'common'
-    if (i >= 10 && i < 25) variant = 'rare'
-    if (i >= 25 && i < 40) variant = 'epic'
-    if (i >= 40) variant = 'legendary'
+    if (i >= 25 && i < 75) variant = 'rare'
+    if (i >= 75 && i < 150) variant = 'epic'
+    if (i >= 150) variant = 'legendary'
 
-    // Boss reward (coins for beating this level) - REDUCED REWARDS
-    const reward = Math.floor(50 * Math.pow(1.08, i))  // Reduced from 100 * 1.1
+    // Special boss variant for milestone levels
+    let isSpecialBoss = i % 25 === 0  // Every 25 levels is a special "BOSS RUSH"
+
+    // Boss reward (coins for beating this level)
+    const reward = Math.floor(40 * Math.pow(1.06, i))
+
+    // Gem reward increases at milestones
+    const gemsReward = isSpecialBoss ? 25 : 10
 
     levels.push({
       level: i,
       health,
       variant,
       reward,
-      milestone: i % 10 === 0, // Every 10 levels is special
+      gemsReward,
+      isSpecialBoss,
+      milestone: i % 25 === 0, // Every 25 levels is special
     })
   }
 

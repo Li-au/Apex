@@ -48,8 +48,8 @@ export default function GameScreen() {
     let totalDPS = 0
     Object.entries(state.heroCount).forEach(([heroId, count]) => {
       const speedMultiplier = state.heroSpeed[heroId] || 1.0
-      // Each hero = +1 DPS × speed multiplier × prestige multiplier
-      totalDPS += count * speedMultiplier * state.prestigeMultiplier
+      // Each hero = +1 DPS × speed × prestige × ascension multipliers
+      totalDPS += count * speedMultiplier * state.prestigeMultiplier * state.ascensionMultiplier
     })
     return totalDPS
   }
@@ -64,14 +64,14 @@ export default function GameScreen() {
       }
     }, 100)
     return () => clearInterval(interval)
-  }, [state.heroCount, state.prestigeMultiplier])
+  }, [state.heroCount, state.heroSpeed, state.prestigeMultiplier, state.ascensionMultiplier])
 
   // Check for level completion
   useEffect(() => {
-    if (state.bossHealth === 0 && state.level < 50) {
+    if (state.bossHealth === 0 && state.level < 200) {
       const levelData = getLevelData(state.level)
-      const reward = levelData.reward
-      const gems = 10  // Reward 10 gems per boss
+      const reward = Math.floor(levelData.reward * state.ascensionMultiplier)
+      const gems = levelData.gemsReward
       dispatch({ type: 'ADD_CURRENCY', payload: reward })
       dispatch({ type: 'ADD_GEMS', payload: gems })
       setTimeout(() => {
@@ -101,6 +101,8 @@ export default function GameScreen() {
         currency={Math.floor(state.currency)}
         gems={state.gems}
         prestige={state.prestige}
+        ascensions={state.ascensions}
+        ascensionMultiplier={state.ascensionMultiplier}
         onMenuClick={() => setShowMenu(true)}
       />
 
@@ -117,7 +119,9 @@ export default function GameScreen() {
       </div>
 
       {/* Bottom Controls */}
-      <div className="bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid grid-cols-4 gap-2">
+      <div className={`bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid ${
+        state.level >= 200 ? 'grid-cols-5' : 'grid-cols-4'
+      } gap-2`}>
         <button
           onClick={() => setShowShop(!showShop)}
           className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
@@ -141,6 +145,18 @@ export default function GameScreen() {
         >
           ✨ Skins
         </button>
+        {state.level >= 200 && (
+          <button
+            onClick={() => {
+              if (window.confirm('Ascend? Reset everything but gain permanent +50% multiplier!')) {
+                dispatch({ type: 'ASCEND' })
+              }
+            }}
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs animate-pulse"
+          >
+            🌟 ASCEND!
+          </button>
+        )}
         <button
           onClick={() => {
             if (window.confirm('Reset all progress? You get a 2x multiplier!')) {
@@ -149,7 +165,7 @@ export default function GameScreen() {
           }}
           className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
         >
-          Prestige x{state.prestige}
+          {state.prestige > 0 ? `Prestige x${state.prestige}` : 'Prestige'}
         </button>
       </div>
 
