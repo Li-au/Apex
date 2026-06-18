@@ -17,10 +17,8 @@ export default function DebugPanel({ state, dispatch, onClose }) {
     }
   }
 
-  const setLevel = (level) => {
-    while (state.level < level && state.level < 200) {
-      dispatch({ type: 'NEXT_LEVEL' })
-    }
+  const jumpToLevel = (level) => {
+    dispatch({ type: 'SET_LEVEL', payload: level })
   }
 
   return (
@@ -85,25 +83,25 @@ export default function DebugPanel({ state, dispatch, onClose }) {
             <div className="font-bold text-white mb-3">📈 PROGRESSION</div>
             <div className="space-y-2">
               <button
-                onClick={() => setLevel(50)}
+                onClick={() => jumpToLevel(50)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 50
               </button>
               <button
-                onClick={() => setLevel(100)}
+                onClick={() => jumpToLevel(100)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 100
               </button>
               <button
-                onClick={() => setLevel(150)}
+                onClick={() => jumpToLevel(150)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 150
               </button>
               <button
-                onClick={() => setLevel(200)}
+                onClick={() => jumpToLevel(200)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 200

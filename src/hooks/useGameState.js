@@ -226,6 +226,18 @@ const gameReducer = (state, action) => {
       }
       return state
 
+    case 'SET_LEVEL': {
+      const targetLevel = Math.min(action.payload, 200)
+      const levelMultiplier = Math.pow(1.15, targetLevel - 1)
+      const newMaxHealth = Math.floor(100 * levelMultiplier)
+      return {
+        ...state,
+        level: targetLevel,
+        bossHealth: newMaxHealth,
+        maxHealth: newMaxHealth,
+      }
+    }
+
     case 'UNLOCK_TALENT': {
       const talentId = action.payload
       const cost = action.cost
