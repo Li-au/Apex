@@ -27,7 +27,7 @@ export default function MenuModal({ onSelectBattlePass, onSelectEvents, onSelect
   ]
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[999] p-4">
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl max-w-md w-full border-2 border-slate-600 shadow-2xl overflow-hidden">
         <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 border-b border-slate-600 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white">Menu</h2>

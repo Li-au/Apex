@@ -19,9 +19,9 @@ export default function HeroUpgrades({ state, dispatch, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[999] p-4">
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl max-w-2xl w-full max-h-96 overflow-y-auto border-2 border-slate-600 shadow-2xl">
-        <div className="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 border-b border-slate-600 flex items-center justify-between">
+        <div className="sticky top-0 z-[1000] bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 border-b border-slate-600 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white">💎 Hero Upgrades</h2>
             <div className="text-sm text-slate-400 mt-1">Speed up your heroes with gems!</div>

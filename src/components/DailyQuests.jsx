@@ -4,9 +4,9 @@ export default function DailyQuests({ state, dispatch, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[999] p-4">
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl max-w-2xl w-full max-h-96 overflow-y-auto border-2 border-amber-500 shadow-2xl">
-        <div className="sticky top-0 bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4 border-b border-amber-500 flex items-center justify-between">
+        <div className="sticky top-0 z-[1000] bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4 border-b border-amber-500 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-white">📋 Daily Quests</h2>
             <div className="text-sm text-amber-100 mt-1">Complete objectives for rewards!</div>

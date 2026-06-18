@@ -8,9 +8,9 @@ export default function StatsPanel({ state, onClose }) {
   const totalMultiplier = prestigeMultiplier * state.ascensionMultiplier
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[999] p-4">
       <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-y-auto border-2 border-purple-500 shadow-2xl">
-        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4 border-b border-purple-500 flex items-center justify-between">
+        <div className="sticky top-0 z-[1000] bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4 border-b border-purple-500 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white">📊 Player Statistics</h2>
           <button
             onClick={onClose}

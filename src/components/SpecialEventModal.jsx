@@ -7,7 +7,7 @@ export default function SpecialEventModal({ event, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[999] p-4">
       <div className="animate-bounce">
         <div className={`bg-gradient-to-br ${difficultyColors[event.difficulty]} rounded-2xl max-w-md w-full border-4 border-white shadow-2xl overflow-hidden`}>
           <div className="bg-black bg-opacity-60 px-6 py-8 text-center">
