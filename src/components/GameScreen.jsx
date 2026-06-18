@@ -18,6 +18,7 @@ import StatsPanel from './StatsPanel'
 import SpecialEventModal from './SpecialEventModal'
 import SidebarButtons from './SidebarButtons'
 import PrestigePanel from './PrestigePanel'
+import DebugPanel from './DebugPanel'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
@@ -30,6 +31,7 @@ export default function GameScreen() {
   const [showQuests, setShowQuests] = useState(false)
   const [showTalents, setShowTalents] = useState(false)
   const [showStats, setShowStats] = useState(false)
+  const [showDebug, setShowDebug] = useState(false)
   const [currentEvent, setCurrentEvent] = useState(null)
   const [floatingDamage, setFloatingDamage] = useState([])
 
@@ -163,6 +165,15 @@ export default function GameScreen() {
         </button>
       )}
 
+      {/* Debug Button (Top Left) */}
+      <button
+        onClick={() => setShowDebug(!showDebug)}
+        className="fixed top-4 left-20 z-40 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg transition-all text-sm opacity-75 hover:opacity-100"
+        title="Debug/Cheat Mode"
+      >
+        🔧
+      </button>
+
       {/* Shop Modal */}
       {showShop && <HeroShop state={state} dispatch={dispatch} onClose={() => setShowShop(false)} />}
 
@@ -186,6 +197,15 @@ export default function GameScreen() {
         <SpecialEventModal
           event={currentEvent}
           onClose={() => setCurrentEvent(null)}
+        />
+      )}
+
+      {/* Debug Panel Modal */}
+      {showDebug && (
+        <DebugPanel
+          state={state}
+          dispatch={dispatch}
+          onClose={() => setShowDebug(false)}
         />
       )}
 
