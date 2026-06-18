@@ -3,6 +3,7 @@ import { useGameState } from '../hooks/useGameState'
 import { getLevelData, LEVELS } from '../data/levels'
 import { SKINS } from '../data/skins'
 import { getHeroDamage } from '../data/heroes'
+import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
 import GameHeader from './GameHeader'
 import GameArea from './GameArea'
 import HeroShop from './HeroShop'
@@ -14,6 +15,7 @@ import EventsLeaderboard from './EventsLeaderboard'
 import DailyQuests from './DailyQuests'
 import TalentTree from './TalentTree'
 import StatsPanel from './StatsPanel'
+import SpecialEventModal from './SpecialEventModal'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
@@ -26,6 +28,7 @@ export default function GameScreen() {
   const [showQuests, setShowQuests] = useState(false)
   const [showTalents, setShowTalents] = useState(false)
   const [showStats, setShowStats] = useState(false)
+  const [currentEvent, setCurrentEvent] = useState(null)
   const [floatingDamage, setFloatingDamage] = useState([])
 
   // Auto-unlock skins based on level
@@ -35,6 +38,16 @@ export default function GameScreen() {
         dispatch({ type: 'UNLOCK_SKIN', payload: skin.id })
       }
     })
+  }, [state.level])
+
+  // Check for special events when reaching milestone levels
+  useEffect(() => {
+    if (isSpecialEventLevel(state.level) && state.bossHealth === getLevelData(state.level).health) {
+      const event = getEventAtLevel(state.level)
+      if (event) {
+        setCurrentEvent(event)
+      }
+    }
   }, [state.level])
 
   // Get current level data and ensure boss health is correct
@@ -214,6 +227,14 @@ export default function GameScreen() {
 
       {/* Stats Panel Modal */}
       {showStats && <StatsPanel state={state} onClose={() => setShowStats(false)} />}
+
+      {/* Special Event Modal */}
+      {currentEvent && (
+        <SpecialEventModal
+          event={currentEvent}
+          onClose={() => setCurrentEvent(null)}
+        />
+      )}
 
       {/* Menu Modal */}
       {showMenu && (

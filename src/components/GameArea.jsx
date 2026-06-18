@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { getLevelData } from '../data/levels'
 import { SKINS } from '../data/skins'
+import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
 
 export default function GameArea({ level, bossHealth, maxHealth, onTap, floatingDamage, activeSkin }) {
   const tapZoneRef = useRef(null)
@@ -9,6 +10,24 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
 
   // Get boss color and emoji based on variant
   const getBossStyle = () => {
+    // Check for special event boss
+    if (isSpecialEventLevel(level)) {
+      const event = getEventAtLevel(level)
+      if (event) {
+        const eventColors = {
+          EPIC: 'from-blue-600 to-purple-600',
+          LEGENDARY: 'from-purple-600 to-pink-600',
+          MYTHICAL: 'from-pink-600 to-yellow-600',
+          TRANSCENDENT: 'from-yellow-500 to-red-600',
+        }
+        return {
+          color: eventColors[event.difficulty] || 'from-yellow-500 to-red-600',
+          emoji: event.boss,
+          name: event.name
+        }
+      }
+    }
+
     const variants = {
       common: { color: 'from-orange-500 to-orange-600', emoji: '👹', name: 'Goblin' },
       rare: { color: 'from-blue-500 to-blue-600', emoji: '🧟', name: 'Zombie' },
