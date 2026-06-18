@@ -12,6 +12,7 @@ import MenuModal from './MenuModal'
 import BattlePass from './BattlePass'
 import EventsLeaderboard from './EventsLeaderboard'
 import DailyQuests from './DailyQuests'
+import TalentTree from './TalentTree'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
@@ -22,6 +23,7 @@ export default function GameScreen() {
   const [showBattlePass, setShowBattlePass] = useState(false)
   const [showEvents, setShowEvents] = useState(false)
   const [showQuests, setShowQuests] = useState(false)
+  const [showTalents, setShowTalents] = useState(false)
   const [floatingDamage, setFloatingDamage] = useState([])
 
   // Auto-unlock skins based on level
@@ -125,7 +127,7 @@ export default function GameScreen() {
 
       {/* Bottom Controls */}
       <div className={`bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid ${
-        state.level >= 200 ? 'grid-cols-6' : 'grid-cols-5'
+        state.level >= 200 ? 'grid-cols-7' : 'grid-cols-6'
       } gap-2`}>
         <button
           onClick={() => setShowShop(!showShop)}
@@ -160,6 +162,13 @@ export default function GameScreen() {
               ✓
             </div>
           )}
+        </button>
+
+        <button
+          onClick={() => setShowTalents(!showTalents)}
+          className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
+        >
+          🌳 Talents
         </button>
 
         {state.level >= 200 && (
@@ -197,6 +206,9 @@ export default function GameScreen() {
 
       {/* Daily Quests Modal */}
       {showQuests && <DailyQuests state={state} dispatch={dispatch} onClose={() => setShowQuests(false)} />}
+
+      {/* Talent Tree Modal */}
+      {showTalents && <TalentTree state={state} dispatch={dispatch} onClose={() => setShowTalents(false)} />}
 
       {/* Menu Modal */}
       {showMenu && (

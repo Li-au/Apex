@@ -27,8 +27,10 @@ const INITIAL_STATE = {
   questsCompletedToday: 0,
   lastQuestReset: new Date().toDateString(),
   // Passive enhancements (compound over time)
-  passiveEarningsMultiplier: 1.0,  // Increases slightly each level
-  passiveDPSMultiplier: 1.0,  // Increases slightly each level
+  passiveEarningsMultiplier: 1.0,
+  passiveDPSMultiplier: 1.0,
+  // Talent tree system
+  unlockedTalents: [],  // Array of talent IDs purchased
 }
 
 const gameReducer = (state, action) => {
@@ -155,6 +157,19 @@ const gameReducer = (state, action) => {
         }
       }
       return state
+
+    case 'UNLOCK_TALENT': {
+      const talentId = action.payload
+      const cost = action.cost
+      if (state.essences >= cost && !state.unlockedTalents.includes(talentId)) {
+        return {
+          ...state,
+          essences: state.essences - cost,
+          unlockedTalents: [...state.unlockedTalents, talentId],
+        }
+      }
+      return state
+    }
 
     case 'UPGRADE_HERO_SPEED': {
       const heroId = action.payload
