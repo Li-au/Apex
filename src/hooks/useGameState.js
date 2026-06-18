@@ -200,14 +200,18 @@ const gameReducer = (state, action) => {
     case 'CLAIM_QUEST_REWARD': {
       const questId = action.payload
       const quest = state.dailyQuests.find(q => q.id === questId)
-      if (quest && quest.completed) {
+      if (quest && quest.completed && !quest.claimed) {
         const reward = quest.reward
         const essenceReward = Math.floor(reward / 2)
+        const updatedQuests = state.dailyQuests.map(q =>
+          q.id === questId ? { ...q, claimed: true } : q
+        )
         return {
           ...state,
           currency: state.currency + reward,
           essences: state.essences + essenceReward,
           questsCompletedToday: state.questsCompletedToday + 1,
+          dailyQuests: updatedQuests,
         }
       }
       return state
