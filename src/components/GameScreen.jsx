@@ -17,7 +17,7 @@ import TalentTree from './TalentTree'
 import StatsPanel from './StatsPanel'
 import SpecialEventModal from './SpecialEventModal'
 import SidebarButtons from './SidebarButtons'
-import PrestigeButton from './PrestigeButton'
+import PrestigePanel from './PrestigePanel'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
@@ -159,8 +159,8 @@ export default function GameScreen() {
         onToggleMenu={() => setShowMenu(!showMenu)}
       />
 
-      {/* Prestige Button (Bottom Center) */}
-      <PrestigeButton state={state} dispatch={dispatch} />
+      {/* Prestige Panel (Right Side) */}
+      <PrestigePanel state={state} dispatch={dispatch} />
 
       {/* Ascend Button (Top Right) */}
       {state.level >= 200 && (
