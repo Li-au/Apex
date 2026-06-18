@@ -13,13 +13,30 @@ A long-term, progressively improvable clicker game designed for daily engagement
 - 5 Cosmetic Skins
 - Full LocalStorage persistence
 
-## Getting Started
+## 🚀 Quick Test
 
+### Play Online (GitHub Pages)
+**Demo coming soon!** Will be deployed to GitHub Pages for instant play.
+
+### Play Locally
 ```bash
+# Clone the repo
 git clone https://github.com/Li-au/Apex.git
 cd Apex
+
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
+```
+
+Then open `http://localhost:5173` in your browser and start clicking! 🎮
+
+### Build for Production
+```bash
+npm run build
+# Output in dist/ folder - ready to deploy
 ```
 
 ## How to Play
