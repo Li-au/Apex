@@ -30,7 +30,13 @@ export default function DailyQuests({ state, dispatch, onClose }) {
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-bold text-white">{quest.name}</h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{quest.icon}</span>
+                  <div>
+                    <h3 className="font-bold text-white">{quest.name}</h3>
+                    <p className="text-xs text-slate-400">{quest.description}</p>
+                  </div>
+                </div>
                 <div className="text-right">
                   <div className="text-sm text-amber-300 font-bold">
                     +{quest.reward} coins

@@ -1,4 +1,5 @@
 import { useReducer, useEffect } from 'react'
+import { resetDailyQuests } from '../data/quests'
 
 const INITIAL_STATE = {
   level: 1,
@@ -21,13 +22,14 @@ const INITIAL_STATE = {
   unlockedSkins: [0],
   achievements: [],
   // Daily quests system
-  dailyQuests: [
-    { id: 0, name: 'Level Up', target: 5, current: 0, reward: 100, completed: false },
-    { id: 1, name: 'Total Tap Damage', target: 50000, current: 0, reward: 150, completed: false },
-    { id: 2, name: 'Buy Heroes', target: 10, current: 0, reward: 200, completed: false },
-  ],
+  dailyQuests: resetDailyQuests(),
   questsCompletedToday: 0,
   lastQuestReset: new Date().toDateString(),
+  // Quest tracking metrics
+  tapsCount: 0,
+  bossKills: 0,
+  currencyEarned: 0,
+  gemsEarned: 0,
   // Passive enhancements (compound over time)
   passiveEarningsMultiplier: 1.0,
   passiveDPSMultiplier: 1.0,
@@ -35,42 +37,89 @@ const INITIAL_STATE = {
   unlockedTalents: [],  // Array of talent IDs purchased
 }
 
+// Helper function to update quests based on their type
+const updateQuests = (quests, questType, amount = 1) => {
+  return quests.map(q => {
+    if (!q.completed && q.type === questType) {
+      const newCurrent = Math.min(q.current + amount, q.target)
+      return { ...q, current: newCurrent, completed: newCurrent >= q.target }
+    }
+    return q
+  })
+}
+
 const gameReducer = (state, action) => {
   switch (action.type) {
     case 'TAP':
       const damage = action.payload
       const newHealth = Math.max(0, state.bossHealth - damage)
-      return { ...state, bossHealth: newHealth, totalDamage: state.totalDamage + damage }
+      const updatedQuests = updateQuests(
+        updateQuests(state.dailyQuests, 'tap_damage', damage),
+        'taps_count',
+        1
+      )
+      return {
+        ...state,
+        bossHealth: newHealth,
+        totalDamage: state.totalDamage + damage,
+        tapsCount: state.tapsCount + 1,
+        dailyQuests: updatedQuests,
+      }
 
     case 'ADD_CURRENCY':
-      return { ...state, currency: state.currency + action.payload }
+      const updatedQuestsForCurrency = updateQuests(
+        updateQuests(state.dailyQuests, 'currency_earned', action.payload),
+        'currency_owned',
+        action.payload
+      )
+      return {
+        ...state,
+        currency: state.currency + action.payload,
+        currencyEarned: state.currencyEarned + action.payload,
+        dailyQuests: updatedQuestsForCurrency,
+      }
 
     case 'NEXT_LEVEL':
       const nextLevel = Math.min(200, state.level + 1)
       const levelMultiplier = Math.pow(1.15, nextLevel - 1)
       const newMaxHealth = Math.floor(100 * levelMultiplier)
       const newProgress = Math.min(state.prestigeProgress + 1, state.prestigeRequirement)
+      const updatedQuestsForLevel = updateQuests(
+        updateQuests(state.dailyQuests, 'levels', 1),
+        'level_milestone',
+        1
+      )
       return {
         ...state,
         level: nextLevel,
         bossHealth: newMaxHealth,
         maxHealth: newMaxHealth,
         prestigeProgress: newProgress,
+        bossKills: state.bossKills + 1,
+        dailyQuests: updatedQuestsForLevel,
       }
 
     case 'BUY_HERO': {
       const heroId = action.payload
       const count = state.heroCount[heroId] || 0
+      const totalHeroes = Object.values(state.heroCount).reduce((a, b) => a + b, 0)
+      const updatedQuestsForHeroes = updateQuests(
+        updateQuests(state.dailyQuests, 'heroes_bought', 1),
+        'heroes_owned',
+        1
+      )
       return {
         ...state,
         heroCount: { ...state.heroCount, [heroId]: count + 1 },
         currency: state.currency - action.heroCost,
+        dailyQuests: updatedQuestsForHeroes,
       }
     }
 
     case 'PRESTIGE':
       if (state.prestigeProgress >= state.prestigeRequirement) {
         const newPrestige = state.prestige + 1
+        const updatedQuestsForPrestige = updateQuests(state.dailyQuests, 'prestige_count', 1)
         return {
           ...state,
           level: 1,
@@ -84,7 +133,12 @@ const gameReducer = (state, action) => {
           prestige: newPrestige,
           prestigeMultiplier: 1 + newPrestige * 0.5,
           prestigeProgress: 0,
-          prestigeRequirement: 20 + newPrestige * 5,  // Increases requirement each prestige
+          prestigeRequirement: 20 + newPrestige * 5,
+          tapsCount: 0,
+          bossKills: 0,
+          currencyEarned: 0,
+          gemsEarned: 0,
+          dailyQuests: updatedQuestsForPrestige,
         }
       }
       return state
@@ -118,7 +172,13 @@ const gameReducer = (state, action) => {
       return { ...state, unlockedSkins: unlockedSkins.sort((a, b) => a - b) }
 
     case 'ADD_GEMS':
-      return { ...state, gems: state.gems + action.payload }
+      const updatedQuestsForGems = updateQuests(state.dailyQuests, 'gems_earned', action.payload)
+      return {
+        ...state,
+        gems: state.gems + action.payload,
+        gemsEarned: state.gemsEarned + action.payload,
+        dailyQuests: updatedQuestsForGems,
+      }
 
     case 'ADD_ESSENCES':
       return { ...state, essences: state.essences + action.payload }
@@ -158,11 +218,7 @@ const gameReducer = (state, action) => {
       if (state.lastQuestReset !== today) {
         return {
           ...state,
-          dailyQuests: [
-            { id: 0, name: 'Level Up', target: 5, current: 0, reward: 100, completed: false },
-            { id: 1, name: 'Total Tap Damage', target: 50000, current: 0, reward: 150, completed: false },
-            { id: 2, name: 'Buy Heroes', target: 10, current: 0, reward: 200, completed: false },
-          ],
+          dailyQuests: resetDailyQuests(),
           lastQuestReset: today,
         }
       }
@@ -185,13 +241,15 @@ const gameReducer = (state, action) => {
       const heroId = action.payload
       const cost = action.cost
       if (state.gems >= cost) {
+        const updatedQuestsForUpgrade = updateQuests(state.dailyQuests, 'hero_upgrades', 1)
         return {
           ...state,
           gems: state.gems - cost,
           heroSpeed: {
             ...state.heroSpeed,
             [heroId]: (state.heroSpeed[heroId] || 1.0) + 0.1
-          }
+          },
+          dailyQuests: updatedQuestsForUpgrade,
         }
       }
       return state
