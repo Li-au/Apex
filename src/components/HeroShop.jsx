@@ -31,7 +31,7 @@ export default function HeroShop({ state, dispatch, onClose }) {
           </button>
         </div>
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-6 grid grid-cols-1 gap-4">
           {HEROES.map(hero => {
             const cost = calculateHeroCost(hero.id)
             const count = state.heroCount[hero.id] || 0
