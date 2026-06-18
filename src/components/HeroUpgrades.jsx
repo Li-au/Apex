@@ -26,9 +26,17 @@ export default function HeroUpgrades({ state, dispatch, onClose }) {
             <h2 className="text-2xl font-bold text-white">💎 Hero Upgrades</h2>
             <div className="text-sm text-slate-400 mt-1">Speed up your heroes with gems!</div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="text-2xl">💎</div>
-            <div className="text-2xl font-bold text-amber-400">{state.gems}</div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="text-2xl">💎</div>
+              <div className="text-2xl font-bold text-amber-400">{state.gems}</div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-2xl text-slate-400 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
           </div>
         </div>
 
