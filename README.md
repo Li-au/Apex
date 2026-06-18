@@ -1,92 +1,48 @@
-# APEX - Clicker Game
+﻿# 🎮 APEX - Clicker Game
 
-A fast-paced, addictive clicker game built with React and Vite. Battle through 50 levels of increasing difficulty, unlock cosmetics, and compete on the leaderboard!
+A long-term, progressively improvable clicker game designed for daily engagement and endless grinding.
 
 ## Features
-
-- **50 Progressive Levels** - Experience exponential difficulty scaling
-- **Hero System** - Buy and upgrade 8 different heroes with auto-attack DPS
-- **Cosmetics** - Unlock 5 unique skins as you progress
-- **Battle Pass** - Free and premium tier rewards
-- **Leaderboard** - Compete with other players worldwide
-- **Prestige System** - Reset and earn multipliers for infinite progression
-- **Responsive Design** - Works on desktop, tablet, and mobile
-- **100% Client-Side** - No backend required, plays offline
-
-## Tech Stack
-
-- **Frontend:** React 18 + Vite
-- **Styling:** Tailwind CSS
-- **State Management:** React Hooks + Context
-- **Storage:** LocalStorage (browser-based saves)
+- 200 Levels with exponential scaling
+- 27 Progressive Heroes (1→378 damage)
+- Prestige System with 6 tiers
+- 15 Daily Quest Types (5 random per day)
+- 12 Permanent Talents across 3 tiers
+- 4 Special Boss Events (levels 50, 100, 150, 200)
+- Ascension System (+50% permanent multiplier at level 200)
+- 5 Cosmetic Skins
+- Full LocalStorage persistence
 
 ## Getting Started
 
-### Development
-
 ```bash
+git clone https://github.com/Li-au/Apex.git
+cd Apex
 npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000` and start tapping!
+## How to Play
+1. Tap the boss to deal damage
+2. Buy heroes for passive income
+3. Upgrade heroes to boost their speed
+4. Complete daily quests for essences
+5. Unlock talents to boost all earnings
+6. Prestige for permanent multipliers
+7. Reach level 200 and ascend!
 
-### Build
+## Tech Stack
+- React 18 + Vite
+- useReducer + Context API
+- Tailwind CSS
+- LocalStorage
+- 58 KB gzipped
 
-```bash
-npm run build
-npm run preview
-```
-
-## Gameplay
-
-1. **Tap** the boss to deal damage
-2. **Earn** currency from taps and heroes
-3. **Buy Heroes** to auto-attack the boss
-4. **Level Up** by defeating bosses
-5. **Unlock Cosmetics** as you progress
-6. **Prestige** when you reach level 50 to get a multiplier and restart
-
-## Game Balance
-
-- Taps: 1 base damage per click (× prestige multiplier)
-- Heroes: 8 different heroes with exponential costs
-- Levels: 50 levels with 1.15x health multiplier each
-- Prestige: +0.5x multiplier per prestige
-
-## Monetization (Prepared)
-
-- Google AdSense integration (placeholder)
-- In-App Purchases for cosmetics (ready to implement)
-- Premium Battle Pass tier
-- No pay-to-win mechanics
-
-## Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers
-
-## Performance
-
-- Bundle size: ~51 KB gzipped
-- Load time: < 2 seconds on 4G
-- Target: 60 FPS gameplay
-
-## Future Features
-
-- Sound effects and music
-- Multiplayer features (real leaderboard)
-- More cosmetics and cosmetics shop
-- Special events and seasonal content
-- Cloud saves and cross-device sync
-- Android app release
-
-## License
-
-MIT
+## Game Mechanics
+- **Damage:** HeroDamage × Count × Speed × Prestige × Ascension
+- **Hero Scaling:** 1→3→6→10→...→378 (triangular)
+- **Levels:** Health = 100 × 1.15^(level-1)
 
 ---
 
-Made with ❤️ using React, Vite, and Tailwind CSS.
+Made with ❤️ | Click, grind, prestige, repeat! 🚀
