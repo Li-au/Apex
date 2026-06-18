@@ -65,29 +65,7 @@ export default function GameScreen() {
     }
   }, [state.level])
 
-  // Calculate DPS from heroes - Each hero has progressive damage
-  const calculateDPS = () => {
-    let totalDPS = 0
-    Object.entries(state.heroCount).forEach(([heroId, count]) => {
-      const heroDamage = getHeroDamage(parseInt(heroId))
-      const speedMultiplier = state.heroSpeed[heroId] || 1.0
-      // DPS = hero base damage × count × speed × prestige × ascension multipliers
-      totalDPS += heroDamage * count * speedMultiplier * state.prestigeMultiplier * state.ascensionMultiplier
-    })
-    return totalDPS
-  }
 
-  // Apply DPS over time
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const dps = calculateDPS()
-      if (dps > 0) {
-        dispatch({ type: 'TAP', payload: dps / 10 })
-        dispatch({ type: 'ADD_CURRENCY', payload: dps / 10 })
-      }
-    }, 100)
-    return () => clearInterval(interval)
-  }, [state.heroCount, state.heroSpeed, state.prestigeMultiplier, state.ascensionMultiplier])
 
   // Check for level completion
   useEffect(() => {
@@ -104,13 +82,22 @@ export default function GameScreen() {
   }, [state.bossHealth, state.level])
 
   const handleTap = (x, y) => {
-    const baseDamage = 1 * state.prestigeMultiplier
-    dispatch({ type: 'TAP', payload: baseDamage })
-    dispatch({ type: 'ADD_CURRENCY', payload: baseDamage })
+    // Base tap damage
+    let totalDamage = 1 * state.prestigeMultiplier
+
+    // Add hero damage on tap
+    Object.entries(state.heroCount).forEach(([heroId, count]) => {
+      const heroDamage = getHeroDamage(parseInt(heroId))
+      const speedMultiplier = state.heroSpeed[heroId] || 1.0
+      totalDamage += heroDamage * count * speedMultiplier * state.prestigeMultiplier * state.ascensionMultiplier
+    })
+
+    dispatch({ type: 'TAP', payload: totalDamage })
+    dispatch({ type: 'ADD_CURRENCY', payload: totalDamage })
 
     // Add floating damage number
     const id = Date.now() + Math.random()
-    setFloatingDamage(prev => [...prev, { id, x, y, damage: baseDamage }])
+    setFloatingDamage(prev => [...prev, { id, x, y, damage: totalDamage }])
     setTimeout(() => {
       setFloatingDamage(prev => prev.filter(d => d.id !== id))
     }, 1000)
