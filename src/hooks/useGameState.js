@@ -30,7 +30,7 @@ const gameReducer = (state, action) => {
       return { ...state, currency: state.currency + action.payload }
 
     case 'NEXT_LEVEL':
-      const nextLevel = Math.min(50, state.level + 1)
+      const nextLevel = Math.min(200, state.level + 1)
       const levelMultiplier = Math.pow(1.15, nextLevel - 1)
       const newMaxHealth = Math.floor(100 * levelMultiplier)
       return {
