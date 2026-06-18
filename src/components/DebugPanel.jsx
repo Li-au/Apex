@@ -1,24 +1,32 @@
 export default function DebugPanel({ state, dispatch, onClose }) {
-  const addCoins = (amount) => dispatch({ type: 'ADD_CURRENCY', payload: amount })
-  const addGems = (amount) => dispatch({ type: 'ADD_GEMS', payload: amount })
-  const addEssences = (amount) => dispatch({ type: 'ADD_ESSENCES', payload: amount })
+  const handleAddCoins = (amount) => {
+    dispatch({ type: 'ADD_CURRENCY', payload: amount })
+  }
 
-  const unlockAllHeroes = () => {
+  const handleAddGems = (amount) => {
+    dispatch({ type: 'ADD_GEMS', payload: amount })
+  }
+
+  const handleAddEssences = (amount) => {
+    dispatch({ type: 'ADD_ESSENCES', payload: amount })
+  }
+
+  const handleJumpLevel = (level) => {
+    console.log('Jumping to level:', level)
+    dispatch({ type: 'SET_LEVEL', payload: level })
+    onClose()
+  }
+
+  const handleUnlockHeroes = () => {
     for (let i = 0; i < 27; i++) {
-      for (let j = 0; j < 10; j++) {
-        dispatch({ type: 'BUY_HERO', payload: i, heroCost: 1 })
-      }
+      dispatch({ type: 'BUY_HERO', payload: i, heroCost: 0 })
     }
   }
 
-  const unlockAllTalents = () => {
+  const handleUnlockTalents = () => {
     for (let i = 0; i < 33; i++) {
       dispatch({ type: 'UNLOCK_TALENT', payload: i })
     }
-  }
-
-  const jumpToLevel = (level) => {
-    dispatch({ type: 'SET_LEVEL', payload: level })
   }
 
   return (
@@ -40,37 +48,37 @@ export default function DebugPanel({ state, dispatch, onClose }) {
             <div className="font-bold text-white mb-3">💰 CURRENCY</div>
             <div className="space-y-2">
               <button
-                onClick={() => addCoins(100000)}
+                onClick={() => handleAddCoins(100000)}
                 className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition-all"
               >
                 + 100k Coins
               </button>
               <button
-                onClick={() => addCoins(1000000)}
+                onClick={() => handleAddCoins(1000000)}
                 className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition-all"
               >
                 + 1M Coins
               </button>
               <button
-                onClick={() => addGems(100)}
+                onClick={() => handleAddGems(100)}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded transition-all"
               >
                 + 100 Gems
               </button>
               <button
-                onClick={() => addGems(500)}
+                onClick={() => handleAddGems(500)}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded transition-all"
               >
                 + 500 Gems
               </button>
               <button
-                onClick={() => addEssences(100)}
+                onClick={() => handleAddEssences(100)}
                 className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded transition-all"
               >
                 + 100 Essences
               </button>
               <button
-                onClick={() => addEssences(500)}
+                onClick={() => handleAddEssences(500)}
                 className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded transition-all"
               >
                 + 500 Essences
@@ -83,25 +91,25 @@ export default function DebugPanel({ state, dispatch, onClose }) {
             <div className="font-bold text-white mb-3">📈 PROGRESSION</div>
             <div className="space-y-2">
               <button
-                onClick={() => jumpToLevel(50)}
+                onClick={() => handleJumpLevel(50)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 50
               </button>
               <button
-                onClick={() => jumpToLevel(100)}
+                onClick={() => handleJumpLevel(100)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 100
               </button>
               <button
-                onClick={() => jumpToLevel(150)}
+                onClick={() => handleJumpLevel(150)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 150
               </button>
               <button
-                onClick={() => jumpToLevel(200)}
+                onClick={() => handleJumpLevel(200)}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Jump to Level 200
@@ -114,13 +122,13 @@ export default function DebugPanel({ state, dispatch, onClose }) {
             <div className="font-bold text-white mb-3">🔓 UNLOCKS</div>
             <div className="space-y-2">
               <button
-                onClick={unlockAllHeroes}
+                onClick={handleUnlockHeroes}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
-                Unlock All Heroes (10x each)
+                Unlock All Heroes
               </button>
               <button
-                onClick={unlockAllTalents}
+                onClick={handleUnlockTalents}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-all text-sm"
               >
                 Unlock All Talents
