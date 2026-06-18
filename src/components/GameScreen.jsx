@@ -16,6 +16,8 @@ import DailyQuests from './DailyQuests'
 import TalentTree from './TalentTree'
 import StatsPanel from './StatsPanel'
 import SpecialEventModal from './SpecialEventModal'
+import SidebarButtons from './SidebarButtons'
+import PrestigeButton from './PrestigeButton'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
@@ -140,75 +142,39 @@ export default function GameScreen() {
         />
       </div>
 
-      {/* Bottom Controls */}
-      <div className={`bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid ${
-        state.level >= 200 ? 'grid-cols-7' : 'grid-cols-6'
-      } gap-2`}>
-        <button
-          onClick={() => setShowShop(!showShop)}
-          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
-        >
-          🛍️ Buy
-        </button>
-        <button
-          onClick={() => setShowUpgrades(!showUpgrades)}
-          className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs relative"
-        >
-          ⚡ Upgrade
-          {state.gems > 0 && (
-            <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              💎
-            </div>
-          )}
-        </button>
-        <button
-          onClick={() => setShowSkins(!showSkins)}
-          className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
-        >
-          ✨ Skins
-        </button>
-        <button
-          onClick={() => setShowQuests(!showQuests)}
-          className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs relative"
-        >
-          📋 Quests
-          {state.dailyQuests.some(q => q.completed && !q.claimed) && (
-            <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              ✓
-            </div>
-          )}
-        </button>
+      {/* Sidebar Buttons */}
+      <SidebarButtons
+        showShop={showShop}
+        showSkins={showSkins}
+        showUpgrades={showUpgrades}
+        showQuests={showQuests}
+        showTalents={showTalents}
+        showMenu={showMenu}
+        questsCompleted={state.dailyQuests.some(q => q.completed && !q.claimed) ? 1 : 0}
+        onToggleShop={() => setShowShop(!showShop)}
+        onToggleSkins={() => setShowSkins(!showSkins)}
+        onToggleUpgrades={() => setShowUpgrades(!showUpgrades)}
+        onToggleQuests={() => setShowQuests(!showQuests)}
+        onToggleTalents={() => setShowTalents(!showTalents)}
+        onToggleMenu={() => setShowMenu(!showMenu)}
+      />
 
-        <button
-          onClick={() => setShowTalents(!showTalents)}
-          className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
-        >
-          🌳 Talents
-        </button>
+      {/* Prestige Button (Bottom Center) */}
+      <PrestigeButton state={state} dispatch={dispatch} />
 
-        {state.level >= 200 && (
-          <button
-            onClick={() => {
-              if (window.confirm('Ascend? Reset everything but gain permanent +50% multiplier!')) {
-                dispatch({ type: 'ASCEND' })
-              }
-            }}
-            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs animate-pulse"
-          >
-            🌟 ASCEND!
-          </button>
-        )}
+      {/* Ascend Button (Top Right) */}
+      {state.level >= 200 && (
         <button
           onClick={() => {
-            if (window.confirm('Reset all progress? You get a 2x multiplier!')) {
-              dispatch({ type: 'PRESTIGE' })
+            if (window.confirm('Ascend? Reset everything but gain permanent +50% multiplier!')) {
+              dispatch({ type: 'ASCEND' })
             }
           }}
-          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs"
+          className="fixed top-24 right-4 z-40 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-4 rounded-lg transition-all transform hover:scale-105 animate-pulse shadow-lg"
         >
-          {state.prestige > 0 ? `Prestige x${state.prestige}` : 'Prestige'}
+          🌟 ASCEND!
         </button>
-      </div>
+      )}
 
       {/* Shop Modal */}
       {showShop && <HeroShop state={state} dispatch={dispatch} onClose={() => setShowShop(false)} />}

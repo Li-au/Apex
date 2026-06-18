@@ -13,6 +13,8 @@ const INITIAL_STATE = {
   heroSpeed: {},
   prestige: 0,
   prestigeMultiplier: 1,
+  prestigeProgress: 0,  // Levels reached towards next prestige
+  prestigeRequirement: 20,  // Must reach X levels to prestige
   ascensions: 0,
   ascensionMultiplier: 1,
   activeSkin: 0,
@@ -47,11 +49,13 @@ const gameReducer = (state, action) => {
       const nextLevel = Math.min(200, state.level + 1)
       const levelMultiplier = Math.pow(1.15, nextLevel - 1)
       const newMaxHealth = Math.floor(100 * levelMultiplier)
+      const newProgress = Math.min(state.prestigeProgress + 1, state.prestigeRequirement)
       return {
         ...state,
         level: nextLevel,
         bossHealth: newMaxHealth,
         maxHealth: newMaxHealth,
+        prestigeProgress: newProgress,
       }
 
     case 'BUY_HERO': {
@@ -65,19 +69,25 @@ const gameReducer = (state, action) => {
     }
 
     case 'PRESTIGE':
-      return {
-        ...state,
-        level: 1,
-        bossHealth: 100,
-        maxHealth: 100,
-        totalDamage: 0,
-        currency: 0,
-        gems: 0,
-        heroCount: {},
-        heroSpeed: {},
-        prestige: state.prestige + 1,
-        prestigeMultiplier: 1 + state.prestige * 0.5,
+      if (state.prestigeProgress >= state.prestigeRequirement) {
+        const newPrestige = state.prestige + 1
+        return {
+          ...state,
+          level: 1,
+          bossHealth: 100,
+          maxHealth: 100,
+          totalDamage: 0,
+          currency: 0,
+          gems: 0,
+          heroCount: {},
+          heroSpeed: {},
+          prestige: newPrestige,
+          prestigeMultiplier: 1 + newPrestige * 0.5,
+          prestigeProgress: 0,
+          prestigeRequirement: 20 + newPrestige * 5,  // Increases requirement each prestige
+        }
       }
+      return state
 
     case 'ASCEND':
       // Ultimate reset with PERMANENT bonuses
