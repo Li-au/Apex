@@ -11,6 +11,7 @@ import HeroUpgrades from './HeroUpgrades'
 import MenuModal from './MenuModal'
 import BattlePass from './BattlePass'
 import EventsLeaderboard from './EventsLeaderboard'
+import DailyQuests from './DailyQuests'
 
 export default function GameScreen() {
   const [state, dispatch] = useGameState()
@@ -20,6 +21,7 @@ export default function GameScreen() {
   const [showMenu, setShowMenu] = useState(false)
   const [showBattlePass, setShowBattlePass] = useState(false)
   const [showEvents, setShowEvents] = useState(false)
+  const [showQuests, setShowQuests] = useState(false)
   const [floatingDamage, setFloatingDamage] = useState([])
 
   // Auto-unlock skins based on level
@@ -102,6 +104,7 @@ export default function GameScreen() {
         level={state.level}
         currency={Math.floor(state.currency)}
         gems={state.gems}
+        essences={state.essences}
         prestige={state.prestige}
         ascensions={state.ascensions}
         ascensionMultiplier={state.ascensionMultiplier}
@@ -122,7 +125,7 @@ export default function GameScreen() {
 
       {/* Bottom Controls */}
       <div className={`bg-slate-900 bg-opacity-50 backdrop-blur p-4 border-t border-slate-700 grid ${
-        state.level >= 200 ? 'grid-cols-5' : 'grid-cols-4'
+        state.level >= 200 ? 'grid-cols-6' : 'grid-cols-5'
       } gap-2`}>
         <button
           onClick={() => setShowShop(!showShop)}
@@ -147,6 +150,18 @@ export default function GameScreen() {
         >
           ✨ Skins
         </button>
+        <button
+          onClick={() => setShowQuests(!showQuests)}
+          className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold py-2 px-2 rounded-lg transition-all transform hover:scale-105 text-xs relative"
+        >
+          📋 Quests
+          {state.dailyQuests.some(q => q.completed && !q.claimed) && (
+            <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              ✓
+            </div>
+          )}
+        </button>
+
         {state.level >= 200 && (
           <button
             onClick={() => {
@@ -179,6 +194,9 @@ export default function GameScreen() {
 
       {/* Skins Modal */}
       {showSkins && <SkinShop state={state} dispatch={dispatch} onClose={() => setShowSkins(false)} />}
+
+      {/* Daily Quests Modal */}
+      {showQuests && <DailyQuests state={state} dispatch={dispatch} onClose={() => setShowQuests(false)} />}
 
       {/* Menu Modal */}
       {showMenu && (

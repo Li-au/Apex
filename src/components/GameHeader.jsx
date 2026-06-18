@@ -1,4 +1,4 @@
-export default function GameHeader({ level, currency, gems, prestige, ascensions, ascensionMultiplier, onMenuClick }) {
+export default function GameHeader({ level, currency, gems, essences, prestige, ascensions, ascensionMultiplier, onMenuClick }) {
   return (
     <div className="bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-600 px-6 py-4">
       <div className="flex items-center justify-between max-w-6xl mx-auto">
@@ -30,6 +30,14 @@ export default function GameHeader({ level, currency, gems, prestige, ascensions
               {gems}
             </div>
             <div className="text-xs text-slate-500">💎</div>
+          </div>
+
+          <div className="text-center">
+            <div className="text-xs text-slate-400 uppercase tracking-wide">Essence</div>
+            <div className="text-3xl font-bold text-cyan-400">
+              {essences}
+            </div>
+            <div className="text-xs text-slate-500">✨</div>
           </div>
         </div>
 

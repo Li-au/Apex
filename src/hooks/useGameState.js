@@ -7,16 +7,28 @@ const INITIAL_STATE = {
   totalDamage: 0,
   currency: 0,
   gems: 0,
+  essences: 0,  // Secondary currency from quests/events
   heroes: [],
   heroCount: {},
   heroSpeed: {},
   prestige: 0,
   prestigeMultiplier: 1,
-  ascensions: 0,  // Number of times ascended (permanent multiplier)
-  ascensionMultiplier: 1,  // Permanent multiplier from ascensions
+  ascensions: 0,
+  ascensionMultiplier: 1,
   activeSkin: 0,
   unlockedSkins: [0],
-  achievements: [],  // Track completed achievements
+  achievements: [],
+  // Daily quests system
+  dailyQuests: [
+    { id: 0, name: 'Level Up', target: 5, current: 0, reward: 100, completed: false },
+    { id: 1, name: 'Total Tap Damage', target: 50000, current: 0, reward: 150, completed: false },
+    { id: 2, name: 'Buy Heroes', target: 10, current: 0, reward: 200, completed: false },
+  ],
+  questsCompletedToday: 0,
+  lastQuestReset: new Date().toDateString(),
+  // Passive enhancements (compound over time)
+  passiveEarningsMultiplier: 1.0,  // Increases slightly each level
+  passiveDPSMultiplier: 1.0,  // Increases slightly each level
 }
 
 const gameReducer = (state, action) => {
@@ -95,6 +107,54 @@ const gameReducer = (state, action) => {
 
     case 'ADD_GEMS':
       return { ...state, gems: state.gems + action.payload }
+
+    case 'ADD_ESSENCES':
+      return { ...state, essences: state.essences + action.payload }
+
+    case 'UPDATE_QUEST_PROGRESS': {
+      const questId = action.payload.questId
+      const progress = action.payload.progress
+      const updatedQuests = state.dailyQuests.map(q => {
+        if (q.id === questId && !q.completed) {
+          const newProgress = Math.min(q.current + progress, q.target)
+          const completed = newProgress >= q.target
+          return { ...q, current: newProgress, completed }
+        }
+        return q
+      })
+      return { ...state, dailyQuests: updatedQuests }
+    }
+
+    case 'CLAIM_QUEST_REWARD': {
+      const questId = action.payload
+      const quest = state.dailyQuests.find(q => q.id === questId)
+      if (quest && quest.completed) {
+        const reward = quest.reward
+        const essenceReward = Math.floor(reward / 2)
+        return {
+          ...state,
+          currency: state.currency + reward,
+          essences: state.essences + essenceReward,
+          questsCompletedToday: state.questsCompletedToday + 1,
+        }
+      }
+      return state
+    }
+
+    case 'RESET_DAILY_QUESTS':
+      const today = new Date().toDateString()
+      if (state.lastQuestReset !== today) {
+        return {
+          ...state,
+          dailyQuests: [
+            { id: 0, name: 'Level Up', target: 5, current: 0, reward: 100, completed: false },
+            { id: 1, name: 'Total Tap Damage', target: 50000, current: 0, reward: 150, completed: false },
+            { id: 2, name: 'Buy Heroes', target: 10, current: 0, reward: 200, completed: false },
+          ],
+          lastQuestReset: today,
+        }
+      }
+      return state
 
     case 'UPGRADE_HERO_SPEED': {
       const heroId = action.payload
