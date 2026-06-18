@@ -49,39 +49,32 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
   const activeSkinData = SKINS.find(s => s.id === activeSkin) || SKINS[0]
 
   return (
-    <div className="w-full max-w-2xl flex flex-col items-center justify-center gap-6">
+    <div className="w-full flex flex-col items-center justify-center gap-1 py-1 px-2">
       {/* Boss Display */}
-      <div className="text-6xl animate-bounce">
+      <div className="text-3xl animate-bounce">
         {bossStyle.emoji}
       </div>
 
       {/* Active Skin Display */}
-      <div className="text-5xl">
+      <div className="text-2xl">
         {activeSkinData.emoji}
       </div>
 
       {/* Boss Name and Level */}
-      <div className="text-center">
-        <div className="text-sm text-slate-400 uppercase tracking-wider">Level {level} Boss</div>
-        <div className="text-2xl font-bold text-white">{bossStyle.name}</div>
-        <div className="text-xs text-slate-500 mt-1">
-          {levelData?.milestone ? '⭐ Milestone Boss!' : ''}
-        </div>
+      <div className="text-center text-xs">
+        <div className="text-slate-400">Lvl {level} • {bossStyle.name}</div>
       </div>
 
       {/* Health Bar */}
-      <div className="w-full px-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-semibold text-slate-300">Health</div>
-          <div className="text-sm text-slate-400">
-            {Math.floor(bossHealth)} / {Math.floor(maxHealth)}
-          </div>
-        </div>
-        <div className="w-full bg-slate-700 rounded-full h-8 overflow-hidden shadow-inner border-2 border-slate-600">
+      <div className="w-full max-w-xs px-2">
+        <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden shadow-inner border border-slate-600">
           <div
             className={`h-full bg-gradient-to-r ${bossStyle.color} transition-all duration-100`}
             style={{ width: `${healthPercent}%` }}
           />
+        </div>
+        <div className="text-center text-xs text-slate-400 mt-0.5">
+          {Math.floor(bossHealth)} / {Math.floor(maxHealth)}
         </div>
       </div>
 
@@ -89,15 +82,14 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
       <button
         ref={tapZoneRef}
         onClick={handleTap}
-        className="relative w-full aspect-square max-w-96 bg-gradient-to-br from-slate-700 to-slate-800 rounded-3xl border-4 border-slate-600 hover:border-amber-500 transition-all shadow-2xl hover:shadow-amber-500/50 active:scale-95 transform duration-100 cursor-pointer group overflow-hidden"
+        className="relative w-40 h-40 bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl border-3 border-slate-600 hover:border-amber-500 transition-all shadow-lg hover:shadow-amber-500/50 active:scale-95 transform duration-100 cursor-pointer group overflow-hidden mt-1"
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center z-10">
-            <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
+            <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">
               👊
             </div>
-            <div className="text-white font-bold text-lg">TAP!</div>
-            <div className="text-slate-400 text-sm mt-2">+1 Damage</div>
+            <div className="text-white font-bold text-xs">TAP!</div>
           </div>
         </div>
 
@@ -117,33 +109,6 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
         ))}
       </button>
 
-      {/* Next Level Preview */}
-      {level < 50 && (
-        <div className="w-full px-4 bg-slate-700 bg-opacity-50 rounded-lg p-3 mt-4">
-          <div className="text-xs text-slate-400 uppercase mb-2">Next Level</div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">
-                {level <= 10 ? '🧟' : level <= 25 ? '🧛' : level <= 40 ? '👹' : '⚡'}
-              </div>
-              <div>
-                <div className="font-bold text-white">Level {level + 1} Preview</div>
-                <div className="text-xs text-slate-500">Health: {getLevelData(level + 1)?.health || 0}</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm font-semibold text-yellow-400">+{getLevelData(level + 1)?.reward || 0}</div>
-              <div className="text-xs text-slate-500">coins</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Info Text */}
-      <div className="text-center text-slate-400 text-sm mt-4">
-        <div>Tap to attack! Buy heroes to auto-attack.</div>
-        <div>Reach level 50 to unlock Prestige.</div>
-      </div>
     </div>
   )
 }
