@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { getLevelData, LEVELS } from '../data/levels'
 import { SKINS } from '../data/skins'
+import { getHeroDamage } from '../data/heroes'
 import GameHeader from './GameHeader'
 import GameArea from './GameArea'
 import HeroShop from './HeroShop'
@@ -43,13 +44,14 @@ export default function GameScreen() {
     }
   }, [state.level])
 
-  // Calculate DPS from heroes - Each hero gives +1 DPS × speed multiplier
+  // Calculate DPS from heroes - Each hero has progressive damage
   const calculateDPS = () => {
     let totalDPS = 0
     Object.entries(state.heroCount).forEach(([heroId, count]) => {
+      const heroDamage = getHeroDamage(parseInt(heroId))
       const speedMultiplier = state.heroSpeed[heroId] || 1.0
-      // Each hero = +1 DPS × speed × prestige × ascension multipliers
-      totalDPS += count * speedMultiplier * state.prestigeMultiplier * state.ascensionMultiplier
+      // DPS = hero base damage × count × speed × prestige × ascension multipliers
+      totalDPS += heroDamage * count * speedMultiplier * state.prestigeMultiplier * state.ascensionMultiplier
     })
     return totalDPS
   }

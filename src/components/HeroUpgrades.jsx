@@ -1,4 +1,4 @@
-import { HEROES } from '../data/heroes'
+import { HEROES, getHeroDamage } from '../data/heroes'
 
 export default function HeroUpgrades({ state, dispatch, onClose }) {
   const calculateUpgradeCost = (heroId) => {
@@ -65,7 +65,7 @@ export default function HeroUpgrades({ state, dispatch, onClose }) {
                 <div className="mb-3">
                   <div className="text-sm font-bold text-white">{hero.name}</div>
                   <div className="text-xs text-slate-500 mt-1">
-                    Current: {(count * speed).toFixed(1)} DPS
+                    Current: {(getHeroDamage(hero.id) * count * speed).toFixed(1)} DPS
                   </div>
                 </div>
 
