@@ -15,8 +15,10 @@ A long-term, progressively improvable clicker game designed for daily engagement
 
 ## 🚀 Quick Test
 
-### Play Online (GitHub Pages)
-**Demo coming soon!** Will be deployed to GitHub Pages for instant play.
+### ▶️ Play Online NOW!
+**[👉 CLICK HERE TO PLAY APEX 👈](https://li-au.github.io/Apex/)**
+
+No installation needed - just click and start grinding! 🎮
 
 ### Play Locally
 ```bash
