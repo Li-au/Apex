@@ -38,11 +38,8 @@ export default function DailyQuests({ state, dispatch, onClose }) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-amber-300 font-bold">
-                    +{quest.reward} coins
-                  </div>
-                  <div className="text-xs text-amber-200">
-                    +{Math.floor(quest.reward / 2)} essence
+                  <div className="text-sm text-cyan-300 font-bold">
+                    +{quest.reward} ✨
                   </div>
                 </div>
               </div>
