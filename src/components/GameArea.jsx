@@ -91,10 +91,9 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center z-10">
             <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
-              👊
+              {activeSkinData.emoji}
             </div>
             <div className="text-white font-bold text-lg">TAP!</div>
-            <div className="text-slate-400 text-sm mt-2">+1 Damage</div>
           </div>
         </div>
 

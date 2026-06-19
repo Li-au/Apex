@@ -5,7 +5,8 @@ export const SKINS = [
     emoji: '👊',
     description: 'Standard warrior',
     unlocked: true,
-    rarity: 'common'
+    rarity: 'common',
+    tapDamageBoost: 0, // 0% boost
   },
   {
     id: 1,
@@ -14,7 +15,8 @@ export const SKINS = [
     description: 'Blazing attacks',
     unlocked: false,
     rarity: 'rare',
-    unlockLevel: 10
+    unlockLevel: 50,
+    tapDamageBoost: 0.15, // +15% tap damage
   },
   {
     id: 2,
@@ -23,7 +25,8 @@ export const SKINS = [
     description: 'Frozen power',
     unlocked: false,
     rarity: 'rare',
-    unlockLevel: 20
+    unlockLevel: 60,
+    tapDamageBoost: 0.15, // +15% tap damage
   },
   {
     id: 3,
@@ -32,7 +35,8 @@ export const SKINS = [
     description: 'Electric force',
     unlocked: false,
     rarity: 'epic',
-    unlockLevel: 30
+    unlockLevel: 100,
+    tapDamageBoost: 0.30, // +30% tap damage
   },
   {
     id: 4,
@@ -41,10 +45,16 @@ export const SKINS = [
     description: 'Godly power',
     unlocked: false,
     rarity: 'legendary',
-    unlockLevel: 40
+    unlockLevel: 150,
+    tapDamageBoost: 0.50, // +50% tap damage
   },
 ]
 
 export function getSkinData(skinId) {
   return SKINS.find(skin => skin.id === skinId) || SKINS[0]
+}
+
+export function getSkinTapBoost(skinId) {
+  const skin = getSkinData(skinId)
+  return skin ? skin.tapDamageBoost : 0
 }

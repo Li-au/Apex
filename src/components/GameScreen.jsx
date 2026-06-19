@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { getLevelData, LEVELS } from '../data/levels'
-import { SKINS } from '../data/skins'
+import { SKINS, getSkinTapBoost } from '../data/skins'
 import { getHeroDamage } from '../data/heroes'
 import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
 import GameHeader from './GameHeader'
@@ -93,6 +93,10 @@ export default function GameScreen() {
       const speedMultiplier = state.heroSpeed[heroId] || 1.0
       totalDamage += heroDamage * count * speedMultiplier * state.prestigeMultiplier * state.ascensionMultiplier
     })
+
+    // Apply skin tap boost
+    const skinBoost = getSkinTapBoost(state.activeSkin)
+    totalDamage *= (1 + skinBoost)
 
     dispatch({ type: 'TAP', payload: totalDamage })
     dispatch({ type: 'ADD_CURRENCY', payload: totalDamage })
