@@ -50,6 +50,11 @@ export default function SkinShop({ state, dispatch, onClose }) {
                 <div className="text-left">
                   <div className="font-bold text-white">{skin.name}</div>
                   <div className="text-xs text-slate-400 mt-1">{skin.description}</div>
+                  {skin.tapDamageBoost > 0 && (
+                    <div className="text-xs text-cyan-400 mt-2 font-semibold">
+                      +{(skin.tapDamageBoost * 100).toFixed(0)}% Tap Damage
+                    </div>
+                  )}
                   <div className={`text-xs mt-2 ${
                     skin.rarity === 'common' ? 'text-gray-400' :
                     skin.rarity === 'rare' ? 'text-blue-400' :
