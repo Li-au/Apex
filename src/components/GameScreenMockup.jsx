@@ -273,57 +273,59 @@ export default function GameScreenMockup() {
             </div>
           </div>
 
-          {/* Boss + tap */}
-          <div className="relative flex-1 w-full flex items-center justify-center">
-            {/* Orbital ring */}
-            <div className="absolute w-[460px] h-[460px] max-w-[80vw] max-h-[80vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none">
-              <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
-              <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
-            </div>
-            {/* Glow */}
-            <div className="absolute w-[360px] h-[360px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
-
-            {/* Boss emoji */}
-            <div className="absolute -translate-y-12 text-[130px] leading-none drop-shadow-[0_0_35px_rgba(168,85,247,0.55)] animate-bounce pointer-events-none">
-              {boss.emoji}
-            </div>
-
-            {/* Floating damage column (right of boss) */}
-            <div className="absolute left-[58%] top-1/2 -translate-y-1/2 w-48 h-72 pointer-events-none">
-              {floaters.map((f) => {
-                const styles = {
-                  normal: 'text-cyan-300 text-xl',
-                  critical: 'text-amber-300 text-3xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]',
-                  godlike: 'text-fuchsia-400 text-3xl drop-shadow-[0_0_12px_rgba(232,121,249,0.7)]',
-                }
-                return (
-                  <div
-                    key={f.id}
-                    className={`damage-number font-bold ${styles[f.tier]}`}
-                    style={{ top: `${f.top}px`, left: `${f.left}px` }}
-                  >
-                    {f.tier !== 'normal' && (
-                      <div className="text-sm tracking-widest uppercase">
-                        {f.tier === 'godlike' ? 'Godlike!' : 'Critical!'}
-                      </div>
-                    )}
-                    <div>+{Math.floor(f.dmg).toLocaleString()}</div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Tap circle */}
-            <button
-              onClick={handleTap}
-              className="absolute bottom-2 w-44 h-44 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
-            >
-              <div className="text-center">
-                <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
-                <div className="text-[11px] tracking-[0.25em] text-purple-300/80 mt-1">TO ATTACK</div>
-                <div className="text-purple-300/70 mt-2 animate-bounce">⌄</div>
+          {/* Boss + tap (fixed-size unit, lifted above bottom panels) */}
+          <div className="relative flex-1 w-full flex items-center justify-center pb-48">
+            <div className="relative w-[420px] h-[420px] max-w-[80vw]">
+              {/* Orbital ring */}
+              <div className="absolute inset-0 rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none">
+                <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
+                <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
               </div>
-            </button>
+              {/* Glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
+
+              {/* Boss emoji */}
+              <div className="absolute top-[60px] left-1/2 -translate-x-1/2 text-[120px] leading-none drop-shadow-[0_0_35px_rgba(168,85,247,0.55)] animate-bounce pointer-events-none">
+                {boss.emoji}
+              </div>
+
+              {/* Floating damage (right of boss) */}
+              <div className="absolute left-[78%] top-[70px] w-48 h-72 pointer-events-none">
+                {floaters.map((f) => {
+                  const styles = {
+                    normal: 'text-cyan-300 text-xl',
+                    critical: 'text-amber-300 text-3xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]',
+                    godlike: 'text-fuchsia-400 text-3xl drop-shadow-[0_0_12px_rgba(232,121,249,0.7)]',
+                  }
+                  return (
+                    <div
+                      key={f.id}
+                      className={`damage-number font-bold ${styles[f.tier]}`}
+                      style={{ top: `${f.top}px`, left: `${f.left}px` }}
+                    >
+                      {f.tier !== 'normal' && (
+                        <div className="text-sm tracking-widest uppercase">
+                          {f.tier === 'godlike' ? 'Godlike!' : 'Critical!'}
+                        </div>
+                      )}
+                      <div>+{Math.floor(f.dmg).toLocaleString()}</div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Tap circle */}
+              <button
+                onClick={handleTap}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
+              >
+                <div className="text-center">
+                  <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
+                  <div className="text-[11px] tracking-[0.25em] text-purple-300/80 mt-1">TO ATTACK</div>
+                  <div className="text-purple-300/70 mt-2 animate-bounce">⌄</div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 
