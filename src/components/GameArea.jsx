@@ -55,11 +55,6 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
         {bossStyle.emoji}
       </div>
 
-      {/* Active Skin Display */}
-      <div className="text-5xl">
-        {activeSkinData.emoji}
-      </div>
-
       {/* Boss Name and Level */}
       <div className="text-center">
         <div className="text-sm text-slate-400 uppercase tracking-wider">Level {level} Boss</div>
