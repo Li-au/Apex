@@ -23,10 +23,10 @@ export default function BossArt({ src, emoji, size = 220 }) {
           alt={emoji}
           onError={() => setErrored(true)}
           style={{ opacity: 0.88 }}
-          className="w-full h-full object-contain pointer-events-none drop-shadow-[0_0_30px_rgba(168,85,247,0.55)] animate-bounce"
+          className="w-full h-full object-contain pointer-events-none drop-shadow-[0_0_30px_rgba(168,85,247,0.55)]"
         />
       ) : (
-        <div className="text-[120px] leading-none drop-shadow-[0_0_35px_rgba(168,85,247,0.55)] animate-bounce">
+        <div className="text-[120px] leading-none drop-shadow-[0_0_35px_rgba(168,85,247,0.55)]">
           {emoji}
         </div>
       )}
