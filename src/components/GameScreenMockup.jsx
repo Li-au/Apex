@@ -287,8 +287,8 @@ export default function GameScreenMockup() {
               {/* Glow */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
 
-              {/* Boss image (real art with emoji fallback) - centered in the orbital ring */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+              {/* Boss image (real art with emoji fallback) - centered, nudged down toward the TAP button */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[42%] pointer-events-none">
                 <BossArt src={bossImgUrl} emoji={boss.emoji} size={380} />
               </div>
 
