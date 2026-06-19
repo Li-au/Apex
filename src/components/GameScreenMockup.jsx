@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { getLevelData } from '../data/levels'
-import { getSkinTapBoost } from '../data/skins'
+import { SKINS, getSkinTapBoost } from '../data/skins'
 import { getHeroDamage } from '../data/heroes'
+import { calculateTalentBonuses } from '../data/talents'
+import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
+import ApexLogo from './ApexLogo'
 import HeroShop from './HeroShop'
 import SkinShop from './SkinShop'
 import HeroUpgrades from './HeroUpgrades'
@@ -14,13 +17,58 @@ import MenuModal from './MenuModal'
 import BattlePass from './BattlePass'
 import EventsLeaderboard from './EventsLeaderboard'
 import DebugPanel from './DebugPanel'
-import { SKINS } from '../data/skins'
-import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
+
+// ---- Small presentational helpers -------------------------------------------
+
+function StatBlock({ icon, iconColor, label, value, children }) {
+  return (
+    <div className="flex items-center gap-3 pl-5 pr-1 border-l border-purple-400/15 first:border-l-0 first:pl-1">
+      <div className={`text-xl ${iconColor}`}>{icon}</div>
+      <div className="leading-tight">
+        <div className="text-[10px] text-slate-500 uppercase tracking-[0.18em]">{label}</div>
+        <div className="text-xl font-bold text-white">{value}</div>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function SideButton({ emoji, label, ring, dot, dotSide = 'right', onClick }) {
+  return (
+    <button onClick={onClick} className="flex flex-col items-center gap-2 group relative">
+      <span
+        className={`absolute top-0 ${dotSide === 'right' ? 'right-1' : 'left-1'} w-2 h-2 rounded-full ${dot}`}
+      />
+      <span
+        className={`w-16 h-16 rounded-full border flex items-center justify-center text-2xl transition-all duration-300 group-hover:scale-105 ${ring}`}
+      >
+        {emoji}
+      </span>
+      <span className="text-[11px] uppercase tracking-[0.18em] text-slate-400 group-hover:text-white transition-colors">
+        {label}
+      </span>
+    </button>
+  )
+}
+
+function Panel({ children, className = '' }) {
+  return (
+    <div
+      className={`rounded-2xl border border-purple-400/20 bg-[#140e26]/70 backdrop-blur-md shadow-xl shadow-black/40 ${className}`}
+    >
+      {children}
+    </div>
+  )
+}
+
+// ---- Main screen ------------------------------------------------------------
 
 export default function GameScreenMockup() {
   const [state, dispatch] = useGameState()
-  const [floatingDamage, setFloatingDamage] = useState([])
+  const [floaters, setFloaters] = useState([])
   const [currentEvent, setCurrentEvent] = useState(null)
+  const [now, setNow] = useState(Date.now())
+
   const [showShop, setShowShop] = useState(false)
   const [showSkins, setShowSkins] = useState(false)
   const [showUpgrades, setShowUpgrades] = useState(false)
@@ -32,352 +80,369 @@ export default function GameScreenMockup() {
   const [showEvents, setShowEvents] = useState(false)
   const [showDebug, setShowDebug] = useState(false)
 
+  // Tick clock for the daily-quest countdown (display only)
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000)
+    return () => clearInterval(t)
+  }, [])
+
+  // Special event detection
   useEffect(() => {
     const levelData = getLevelData(state.level)
-    if (levelData?.specialEvent) {
-      setCurrentEvent(levelData.specialEvent)
-    }
+    if (levelData?.specialEvent) setCurrentEvent(levelData.specialEvent)
   }, [state.level])
 
-  const getLevelData_alt = (level) => {
-    return getLevelData(level)
-  }
+  // Boss completion -> next level (unchanged mechanic, wired here)
+  useEffect(() => {
+    if (state.bossHealth === 0 && state.level < 200) {
+      const levelData = getLevelData(state.level)
+      const reward = Math.floor((levelData?.reward || 0) * state.ascensionMultiplier)
+      const gems = levelData?.gemsReward || 0
+      dispatch({ type: 'ADD_CURRENCY', payload: reward })
+      dispatch({ type: 'ADD_GEMS', payload: gems })
+      const tid = setTimeout(() => dispatch({ type: 'NEXT_LEVEL' }), 600)
+      return () => clearTimeout(tid)
+    }
+  }, [state.bossHealth, state.level])
 
+  // ---- Derived values ----
   const getBossStyle = () => {
     if (isSpecialEventLevel(state.level)) {
       const event = getEventAtLevel(state.level)
-      if (event) {
-        const eventColors = {
-          EPIC: 'from-blue-600 to-purple-600',
-          LEGENDARY: 'from-purple-600 to-pink-600',
-          MYTHICAL: 'from-pink-600 to-yellow-600',
-          TRANSCENDENT: 'from-yellow-500 to-red-600',
-        }
-        return { color: eventColors[event.difficulty] || 'from-yellow-500 to-red-600', emoji: event.boss, name: event.name }
-      }
+      if (event) return { emoji: event.boss, name: event.name }
     }
-    const levelData = getLevelData_alt(state.level)
     const variants = {
-      common: { color: 'from-orange-500 to-orange-600', emoji: '👹', name: 'Goblin' },
-      rare: { color: 'from-blue-500 to-blue-600', emoji: '🧟', name: 'Zombie' },
-      epic: { color: 'from-purple-600 to-purple-700', emoji: '🧛', name: 'Vampire' },
-      legendary: { color: 'from-indigo-600 to-indigo-900', emoji: '👹', name: 'Demon' },
+      common: { emoji: '👹', name: 'Goblin' },
+      rare: { emoji: '🧟', name: 'Zombie' },
+      epic: { emoji: '🧛', name: 'Vampire' },
+      legendary: { emoji: '👹', name: 'Demon' },
     }
+    const levelData = getLevelData(state.level)
     return variants[levelData?.variant || 'common']
   }
+  const boss = getBossStyle()
+  const healthPercent = (state.bossHealth / state.maxHealth) * 100
+  const levelProgress = Math.max(0, Math.min(100, (1 - state.bossHealth / state.maxHealth) * 100))
 
-  const bossStyle = getBossStyle()
-  const levelData = getLevelData_alt(state.level)
-  const maxHealth = state.maxHealth
-  const healthPercent = (state.bossHealth / maxHealth) * 100
-
-  const handleTap = (x, y) => {
-    let totalDamage = 1 * state.prestigeMultiplier
+  const damagePerTap = (() => {
+    let total = 1 * state.prestigeMultiplier
     Object.entries(state.heroCount).forEach(([heroId, count]) => {
-      const heroDamage = getHeroDamage(parseInt(heroId))
-      const speedMultiplier = state.heroSpeed[heroId] || 1.0
-      totalDamage += heroDamage * count * speedMultiplier * state.prestigeMultiplier * state.ascensionMultiplier
+      const dmg = getHeroDamage(parseInt(heroId))
+      const spd = state.heroSpeed[heroId] || 1.0
+      total += dmg * count * spd * state.prestigeMultiplier * state.ascensionMultiplier
     })
-    const skinBoost = getSkinTapBoost(state.activeSkin)
-    totalDamage *= (1 + skinBoost)
+    return total * (1 + getSkinTapBoost(state.activeSkin))
+  })()
 
-    dispatch({ type: 'TAP', payload: totalDamage })
-    dispatch({ type: 'ADD_CURRENCY', payload: totalDamage })
+  const prestigePercent = Math.max(
+    0,
+    Math.min(100, (state.prestigeProgress / state.prestigeRequirement) * 100)
+  )
+  const nextPrestigeRemaining = Math.max(0, 100 - prestigePercent)
+  const canPrestige = state.prestigeProgress >= state.prestigeRequirement
 
-    const id = Date.now() + Math.random()
-    const random = Math.random()
-    let label = '+' + Math.floor(totalDamage).toLocaleString()
-    if (random > 0.9) label = '+' + Math.floor(totalDamage).toLocaleString() + '\nGODLIKE!'
-    else if (random > 0.7) label = '+' + Math.floor(totalDamage).toLocaleString() + '\nCRITICAL!'
+  const talentBonuses = calculateTalentBonuses(state.unlockedTalents)
+  const activeBonuses = [
+    { icon: '$', color: 'text-amber-400', value: talentBonuses.earningsMultiplier, label: 'Coins' },
+    { icon: '◆', color: 'text-indigo-400', value: talentBonuses.gemMultiplier, label: 'Gems' },
+    { icon: '💧', color: 'text-cyan-400', value: talentBonuses.tapDamageMultiplier, label: 'Essences' },
+    { icon: '◉', color: 'text-purple-400', value: talentBonuses.criticalMultiplier, label: 'Crit Chance' },
+  ]
 
-    setFloatingDamage(prev => [...prev, { id, x, y, damage: totalDamage, label, random }])
-    setTimeout(() => {
-      setFloatingDamage(prev => prev.filter(d => d.id !== id))
-    }, 1000)
+  // Daily quest countdown to next local midnight
+  const msToMidnight = (() => {
+    const d = new Date(now)
+    const next = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0)
+    return next - d
+  })()
+  const hrs = Math.floor(msToMidnight / 3600000)
+  const mins = Math.floor((msToMidnight % 3600000) / 60000)
+
+  const fmt = (n) => {
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B'
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M'
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K'
+    return Math.floor(n).toString()
   }
 
-  const prestigeData = state.prestige > 0 ? {
-    currentReq: 20 + (state.prestige - 1) * 5,
-    nextReq: 20 + state.prestige * 5,
-  } : { currentReq: 20, nextReq: 20 }
-  const prestigeProgress = Math.max(0, Math.min(100, ((state.level - prestigeData.currentReq) / (prestigeData.nextReq - prestigeData.currentReq)) * 100))
+  // ---- Tap handling ----
+  const handleTap = () => {
+    const dmg = damagePerTap
+    dispatch({ type: 'TAP', payload: dmg })
+    dispatch({ type: 'ADD_CURRENCY', payload: dmg })
+
+    const roll = Math.random()
+    const tier = roll > 0.94 ? 'godlike' : roll > 0.8 ? 'critical' : 'normal'
+    const id = Date.now() + Math.random()
+    const top = 20 + Math.random() * 150
+    const left = Math.random() * 40
+    setFloaters((prev) => [...prev, { id, dmg, tier, top, left }])
+    setTimeout(() => setFloaters((prev) => prev.filter((f) => f.id !== id)), 1000)
+  }
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 text-white overflow-hidden flex flex-col">
-      {/* HEADER */}
-      <div className="h-20 bg-gradient-to-b from-slate-900/90 via-purple-900/30 to-transparent border-b border-purple-500/40 px-8 py-4 flex items-center justify-between gap-12">
-        {/* Stats */}
-        <div className="flex items-center gap-12 flex-1">
-          {/* Level */}
-          <div className="flex items-center gap-4 border-l border-purple-500/30 pl-4">
-            <div className="text-amber-400 text-2xl">▲</div>
-            <div>
-              <div className="text-xs text-slate-500 uppercase tracking-widest">Level</div>
-              <div className="text-3xl font-bold text-white">{state.level}</div>
-              <div className="w-16 h-1 bg-slate-700 rounded-full overflow-hidden mt-1">
-                <div className="h-full bg-amber-500" style={{ width: '42%' }} />
+    <div className="w-full h-screen overflow-hidden bg-gradient-to-br from-[#0c0717] via-[#150b2e] to-[#0a0612] text-white flex flex-col select-none">
+      {/* ===================== HEADER ===================== */}
+      <div className="px-5 pt-4 pb-2 flex items-stretch gap-4">
+        {/* Main stats pill */}
+        <Panel className="flex-1 px-5 py-3 flex items-center gap-1">
+          {/* Logo */}
+          <div className="pr-5 border-r border-purple-400/15">
+            <ApexLogo size={38} />
+          </div>
+          {/* Level with progress */}
+          <div className="flex items-center gap-3 pl-5 pr-1">
+            <div className="leading-tight">
+              <div className="text-[10px] text-slate-500 uppercase tracking-[0.18em]">Level</div>
+              <div className="text-2xl font-bold text-white">{state.level}</div>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="w-20 h-1 bg-slate-700/70 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-500 to-amber-300"
+                    style={{ width: `${levelProgress}%` }}
+                  />
+                </div>
+                <span className="text-[10px] text-amber-400">{Math.floor(levelProgress)}%</span>
               </div>
             </div>
           </div>
+          <StatBlock icon="$" iconColor="text-amber-400" label="Coins" value={fmt(state.currency)} />
+          <StatBlock icon="◆" iconColor="text-indigo-400" label="Gems" value={fmt(state.gems)} />
+          <StatBlock icon="💧" iconColor="text-cyan-400" label="Essences" value={fmt(state.essences)} />
+          <StatBlock icon="◉" iconColor="text-purple-400" label="Prestige" value={state.prestige} />
+        </Panel>
 
-          {/* Coins */}
-          <div className="flex items-center gap-3 border-l border-purple-500/30 pl-4">
-            <div className="text-amber-400 text-2xl">$</div>
-            <div>
-              <div className="text-xs text-slate-500 uppercase tracking-widest">Coins</div>
-              <div className="text-2xl font-bold text-white">{(state.currency / 1e9).toFixed(2)}B</div>
-            </div>
-          </div>
-
-          {/* Gems */}
-          <div className="flex items-center gap-3 border-l border-purple-500/30 pl-4">
-            <div className="text-indigo-400 text-2xl">◆</div>
-            <div>
-              <div className="text-xs text-slate-500 uppercase tracking-widest">Gems</div>
-              <div className="text-2xl font-bold text-white">{state.gems}</div>
-            </div>
-          </div>
-
-          {/* Essences */}
-          <div className="flex items-center gap-3 border-l border-purple-500/30 pl-4">
-            <div className="text-cyan-400 text-2xl">💧</div>
-            <div>
-              <div className="text-xs text-slate-500 uppercase tracking-widest">Essences</div>
-              <div className="text-2xl font-bold text-white">{(state.essences / 1e3).toFixed(1)}K</div>
-            </div>
-          </div>
-
-          {/* Prestige */}
-          <div className="flex items-center gap-3 border-l border-purple-500/30 pl-4">
-            <div className="text-purple-400 text-2xl">◉</div>
-            <div>
-              <div className="text-xs text-slate-500 uppercase tracking-widest">Prestige</div>
-              <div className="text-2xl font-bold text-white">{state.prestige}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Ascend Button */}
-        {state.level >= 200 && (
+        {/* Ascend pill */}
+        <Panel
+          className={`px-6 flex items-center gap-3 ${state.level >= 200 ? 'cursor-pointer hover:border-red-400/50' : 'opacity-80'}`}
+        >
           <button
+            disabled={state.level < 200}
             onClick={() => {
-              if (window.confirm('Ascend? Reset everything but gain permanent +50% multiplier!')) {
+              if (state.level >= 200 && window.confirm('Ascend? Reset everything but gain a permanent +50% multiplier!')) {
                 dispatch({ type: 'ASCEND' })
               }
             }}
-            className="px-6 py-2 bg-gradient-to-r from-red-600/70 to-red-700/70 border border-red-500/50 rounded-lg font-bold text-sm text-white hover:from-red-600 hover:to-red-700 transition"
+            className="flex items-center gap-3 disabled:cursor-not-allowed"
           >
-            🔒 ASCEND
-            <div className="text-xs text-red-300 mt-0.5">Unlocks at Lv. 200</div>
+            <span className="text-xl text-red-400/70">{state.level >= 200 ? '🔓' : '🔒'}</span>
+            <div className="text-left leading-tight">
+              <div className="text-sm font-bold tracking-[0.18em] text-red-400">ASCEND</div>
+              <div className="text-[10px] text-slate-500">Unlocks at Lv. 200</div>
+            </div>
           </button>
-        )}
+        </Panel>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="flex-1 flex relative">
-        {/* LEFT SIDEBAR */}
-        <div className="w-40 border-r border-purple-500/30 flex flex-col items-center pt-12 gap-12 pb-48 px-4 overflow-y-auto">
-          {/* Shop */}
-          <button onClick={() => setShowShop(true)} className="flex flex-col items-center gap-3 group relative">
-            <div className="absolute -top-2 -right-2 w-2.5 h-2.5 bg-amber-400 rounded-full"></div>
-            <div className="w-20 h-20 rounded-full border-2 border-amber-500/60 flex items-center justify-center text-3xl group-hover:bg-amber-500/10 transition">🛍️</div>
-            <div className="text-xs uppercase tracking-widest text-slate-500">Shop</div>
-          </button>
-
-          {/* Quests */}
-          <button onClick={() => setShowQuests(true)} className="flex flex-col items-center gap-3 group relative">
-            <div className="absolute -top-2 -right-2 w-2.5 h-2.5 bg-cyan-400 rounded-full"></div>
-            <div className="w-20 h-20 rounded-full border-2 border-cyan-500/60 flex items-center justify-center text-3xl group-hover:bg-cyan-500/10 transition">📋</div>
-            <div className="text-xs uppercase tracking-widest text-slate-500">Quests</div>
-          </button>
-
-          {/* Talents */}
-          <button onClick={() => setShowTalents(true)} className="flex flex-col items-center gap-3 group relative">
-            <div className="absolute -top-2 -right-2 w-2.5 h-2.5 bg-purple-400 rounded-full"></div>
-            <div className="w-20 h-20 rounded-full border-2 border-purple-500/60 flex items-center justify-center text-3xl group-hover:bg-purple-500/10 transition">🌳</div>
-            <div className="text-xs uppercase tracking-widest text-slate-500">Talents</div>
-          </button>
-
-          {/* Daily Quests */}
-          <div className="mt-auto border-t border-purple-500/30 pt-8 w-full">
-            <div className="text-xs uppercase tracking-widest text-slate-600 mb-6">Daily Quests</div>
-            {state.dailyQuests.slice(0, 3).map((q, i) => (
-              <div key={i} className="mb-4 text-xs">
-                <div className="flex justify-between mb-1">
-                  <div className="text-slate-400">{q.icon} {q.name}</div>
-                  <div className="text-cyan-400 font-bold">{q.reward}✨</div>
-                </div>
-                <div className="bg-slate-700/40 h-1 rounded-full overflow-hidden">
-                  <div className="h-full bg-cyan-500" style={{ width: `${Math.min((q.current / q.target) * 100, 100)}%` }} />
-                </div>
-              </div>
-            ))}
-            <button className="w-full text-xs uppercase tracking-widest text-slate-600 hover:text-purple-400 mt-4 py-2 border-t border-purple-500/20">View All ></button>
-          </div>
+      {/* ===================== MAIN STAGE ===================== */}
+      <div className="relative flex-1 overflow-hidden">
+        {/* Left sidebar */}
+        <div className="absolute left-6 top-6 flex flex-col gap-9 z-20">
+          <SideButton emoji="🛍️" label="Shop" ring="border-amber-400/50 group-hover:border-amber-300 group-hover:bg-amber-500/10" dot="bg-amber-400" onClick={() => setShowShop(true)} />
+          <SideButton emoji="📋" label="Quests" ring="border-cyan-400/50 group-hover:border-cyan-300 group-hover:bg-cyan-500/10" dot="bg-cyan-400" onClick={() => setShowQuests(true)} />
+          <SideButton emoji="🌐" label="Talents" ring="border-purple-400/50 group-hover:border-purple-300 group-hover:bg-purple-500/10" dot="bg-purple-400" onClick={() => setShowTalents(true)} />
         </div>
 
-        {/* CENTER - BOSS AND TAP ZONE */}
-        <div className="flex-1 flex flex-col items-center justify-center relative">
-          {/* Boss Title */}
-          <div className="text-center mb-8">
-            <div className="text-4xl font-bold text-white uppercase tracking-[0.15em]">VOID TITAN</div>
-            <div className="text-xs text-slate-500 uppercase tracking-widest mt-2">BOSS</div>
+        {/* Right sidebar */}
+        <div className="absolute right-6 top-6 flex flex-col gap-9 z-20 items-center">
+          <SideButton emoji="🎭" label="Skins" ring="border-rose-400/50 group-hover:border-rose-300 group-hover:bg-rose-500/10" dot="bg-rose-400" dotSide="left" onClick={() => setShowSkins(true)} />
+          <SideButton emoji="⏫" label="Upgrades" ring="border-amber-400/50 group-hover:border-amber-300 group-hover:bg-amber-500/10" dot="bg-amber-400" dotSide="left" onClick={() => setShowUpgrades(true)} />
+          <SideButton emoji="☰" label="Menu" ring="border-cyan-400/50 group-hover:border-cyan-300 group-hover:bg-cyan-500/10" dot="bg-cyan-400" dotSide="left" onClick={() => setShowMenu(true)} />
+        </div>
+
+        {/* Center boss stage */}
+        <div className="absolute inset-0 flex flex-col items-center pt-4">
+          {/* Boss title */}
+          <div className="flex items-center gap-4 mb-3">
+            <span className="text-purple-400/40 text-sm">◇ ──────</span>
+            <h2 className="text-3xl font-bold tracking-[0.35em] text-white uppercase">{boss.name}</h2>
+            <span className="text-purple-400/40 text-sm">────── ◇</span>
           </div>
 
-          {/* Health Bar */}
-          <div className="w-96 mb-12">
-            <div className="h-4 bg-red-900/40 border border-red-600/60 rounded-lg overflow-hidden shadow-lg shadow-red-600/20">
-              <div className="h-full bg-gradient-to-r from-red-600 to-red-500 transition-all" style={{ width: `${healthPercent}%` }} />
+          {/* Health bar */}
+          <div className="w-[420px] max-w-[60vw]">
+            <div className="h-2.5 rounded-full bg-slate-800/80 overflow-hidden border border-red-500/20">
+              <div
+                className="h-full bg-gradient-to-r from-red-600 to-rose-500 transition-all duration-100"
+                style={{ width: `${healthPercent}%` }}
+              />
             </div>
-            <div className="text-xs text-slate-500 text-center mt-2">{Math.floor(state.bossHealth).toLocaleString()} / {Math.floor(maxHealth).toLocaleString()} HP</div>
+            <div className="text-center text-sm text-rose-300/90 mt-2 tracking-wide">
+              <span className="text-rose-400 font-semibold">{fmt(state.bossHealth)}</span>
+              <span className="text-slate-500"> / {fmt(state.maxHealth)} HP</span>
+            </div>
           </div>
 
-          {/* Boss Display */}
-          <div className="relative w-full h-80 flex items-center justify-center mb-8">
-            {/* Glow Background */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-96 h-96 bg-gradient-to-b from-purple-600/50 via-purple-500/20 to-purple-600/30 rounded-full blur-3xl opacity-60" />
+          {/* Boss + tap */}
+          <div className="relative flex-1 w-full flex items-center justify-center">
+            {/* Orbital ring */}
+            <div className="absolute w-[460px] h-[460px] max-w-[80vw] max-h-[80vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none">
+              <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
+              <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
+            </div>
+            {/* Glow */}
+            <div className="absolute w-[360px] h-[360px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
+
+            {/* Boss emoji */}
+            <div className="absolute -translate-y-12 text-[130px] leading-none drop-shadow-[0_0_35px_rgba(168,85,247,0.55)] animate-bounce pointer-events-none">
+              {boss.emoji}
             </div>
 
-            {/* Boss Emoji */}
-            <div className="text-9xl animate-bounce relative z-10">{bossStyle.emoji}</div>
+            {/* Floating damage column (right of boss) */}
+            <div className="absolute left-[58%] top-1/2 -translate-y-1/2 w-48 h-72 pointer-events-none">
+              {floaters.map((f) => {
+                const styles = {
+                  normal: 'text-cyan-300 text-xl',
+                  critical: 'text-amber-300 text-3xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]',
+                  godlike: 'text-fuchsia-400 text-3xl drop-shadow-[0_0_12px_rgba(232,121,249,0.7)]',
+                }
+                return (
+                  <div
+                    key={f.id}
+                    className={`damage-number font-bold ${styles[f.tier]}`}
+                    style={{ top: `${f.top}px`, left: `${f.left}px` }}
+                  >
+                    {f.tier !== 'normal' && (
+                      <div className="text-sm tracking-widest uppercase">
+                        {f.tier === 'godlike' ? 'Godlike!' : 'Critical!'}
+                      </div>
+                    )}
+                    <div>+{Math.floor(f.dmg).toLocaleString()}</div>
+                  </div>
+                )
+              })}
+            </div>
 
-            {/* TAP ZONE */}
+            {/* Tap circle */}
             <button
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                handleTap(e.clientX - rect.left, e.clientY - rect.top)
-              }}
-              className="absolute w-80 h-80 rounded-full border-2 border-purple-400/70 hover:border-purple-300 bg-gradient-to-b from-purple-500/10 to-transparent flex items-center justify-center cursor-pointer transform hover:scale-110 transition-transform active:scale-95"
+              onClick={handleTap}
+              className="absolute bottom-2 w-44 h-44 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
             >
-              <div className="text-center z-20">
-                <div className="text-2xl text-purple-300 uppercase tracking-[0.2em] font-light">TAP</div>
-                <div className="text-xs text-purple-400 uppercase tracking-[0.1em] mt-3 font-light">TO ATTACK</div>
-                <div className="text-3xl text-purple-400 mt-4 animate-bounce">▼</div>
+              <div className="text-center">
+                <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
+                <div className="text-[11px] tracking-[0.25em] text-purple-300/80 mt-1">TO ATTACK</div>
+                <div className="text-purple-300/70 mt-2 animate-bounce">⌄</div>
               </div>
-
-              {/* Floating Damage */}
-              {floatingDamage.map(({ id, x, y, label, random }) => (
-                <div
-                  key={id}
-                  className={`absolute pointer-events-none font-bold text-lg drop-shadow-lg ${random > 0.9 ? 'text-rose-400' : random > 0.7 ? 'text-cyan-400' : 'text-amber-400'}`}
-                  style={{
-                    left: `${x}px`,
-                    top: `${y}px`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                >
-                  {label}
-                </div>
-              ))}
             </button>
           </div>
+        </div>
 
-          {/* Damage Info */}
-          <div className="text-center">
-            <div className="text-xl text-white">+{Math.floor(
-              1 * state.prestigeMultiplier +
-              Object.entries(state.heroCount).reduce((sum, [heroId, count]) => {
-                const heroDamage = getHeroDamage(parseInt(heroId))
-                return sum + heroDamage * count * (state.heroSpeed[heroId] || 1.0) * state.prestigeMultiplier * state.ascensionMultiplier
-              }, 0) * (1 + getSkinTapBoost(state.activeSkin))
-            )} Damage</div>
-            {(state.prestigeMultiplier > 1 || state.ascensionMultiplier > 1) && (
-              <div className="text-xs text-slate-400 mt-3 space-y-1">
-                {state.prestigeMultiplier > 1 && <div className="text-purple-400">×{state.prestigeMultiplier.toFixed(2)} Prestige</div>}
-                {state.ascensionMultiplier > 1 && <div className="text-red-400">×{state.ascensionMultiplier.toFixed(2)} Ascension</div>}
+        {/* ===== Bottom-left: Daily Quests ===== */}
+        <Panel className="absolute left-6 bottom-5 w-72 p-4 z-20">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs uppercase tracking-[0.2em] text-slate-300 font-semibold">Daily Quests</span>
+            <span className="text-[11px] text-slate-500 flex items-center gap-1">🕐 {hrs}h {mins}m</span>
+          </div>
+          <div className="space-y-3">
+            {state.dailyQuests.slice(0, 3).map((q, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full border border-amber-400/40 flex items-center justify-center text-sm shrink-0">
+                  {q.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-slate-200 truncate">{q.name}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex-1 h-1 bg-slate-700/70 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-500 to-amber-300"
+                        style={{ width: `${Math.min((q.current / q.target) * 100, 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-slate-500 whitespace-nowrap">
+                      {fmt(q.current || 0)} / {fmt(q.target)}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-xs font-bold text-cyan-300 whitespace-nowrap shrink-0">{q.reward}✨</div>
               </div>
-            )}
+            ))}
           </div>
-        </div>
-
-        {/* RIGHT SIDEBAR */}
-        <div className="w-40 border-l border-purple-500/30 flex flex-col items-center pt-12 gap-12 pb-48 px-4 overflow-y-auto">
-          {/* Skins */}
-          <button onClick={() => setShowSkins(true)} className="flex flex-col items-center gap-3 group relative">
-            <div className="absolute -top-2 -left-2 w-2.5 h-2.5 bg-pink-400 rounded-full"></div>
-            <div className="w-20 h-20 rounded-full border-2 border-pink-500/60 flex items-center justify-center text-3xl group-hover:bg-pink-500/10 transition">✨</div>
-            <div className="text-xs uppercase tracking-widest text-slate-500">Skins</div>
-          </button>
-
-          {/* Upgrades */}
-          <button onClick={() => setShowUpgrades(true)} className="flex flex-col items-center gap-3 group relative">
-            <div className="absolute -top-2 -left-2 w-2.5 h-2.5 bg-amber-400 rounded-full"></div>
-            <div className="w-20 h-20 rounded-full border-2 border-amber-500/60 flex items-center justify-center text-3xl group-hover:bg-amber-500/10 transition">⚡</div>
-            <div className="text-xs uppercase tracking-widest text-slate-500">Upgrades</div>
-          </button>
-
-          {/* Menu */}
-          <button onClick={() => setShowMenu(true)} className="flex flex-col items-center gap-3 group relative">
-            <div className="absolute -top-2 -left-2 w-2.5 h-2.5 bg-slate-400 rounded-full"></div>
-            <div className="w-20 h-20 rounded-full border-2 border-slate-500/60 flex items-center justify-center text-3xl group-hover:bg-slate-500/10 transition">☰</div>
-            <div className="text-xs uppercase tracking-widest text-slate-500">Menu</div>
-          </button>
-        </div>
-      </div>
-
-      {/* BOTTOM SECTION */}
-      <div className="h-48 border-t border-purple-500/30 px-8 py-6 flex justify-between items-end gap-8 bg-gradient-to-t from-purple-900/20 to-transparent">
-        {/* Active Bonuses */}
-        <div className="border border-purple-500/40 rounded-2xl p-6 bg-gradient-to-br from-purple-900/40 to-transparent">
-          <div className="text-xs uppercase tracking-widest text-slate-600 mb-4">Active Bonuses</div>
-          <div className="flex gap-8">
-            <div className="text-center"><div className="text-2xl mb-2">$</div><div className="text-amber-400 font-bold">+245%</div><div className="text-xs text-slate-600">Coins</div></div>
-            <div className="text-center"><div className="text-2xl mb-2">◆</div><div className="text-indigo-400 font-bold">+180%</div><div className="text-xs text-slate-600">Gems</div></div>
-            <div className="text-center"><div className="text-2xl mb-2">💧</div><div className="text-cyan-400 font-bold">+320%</div><div className="text-xs text-slate-600">Essences</div></div>
-            <div className="text-center"><div className="text-2xl mb-2">⚡</div><div className="text-purple-400 font-bold">+15.7%</div><div className="text-xs text-slate-600">Crit</div></div>
-          </div>
-        </div>
-
-        {/* Prestige Progress */}
-        <div className="border border-purple-500/40 rounded-2xl p-8 bg-gradient-to-br from-purple-900/40 to-transparent min-w-64">
-          <svg width="140" height="140" className="mx-auto mb-4">
-            <circle cx="70" cy="70" r="60" fill="none" stroke="#1e293b" strokeWidth="3" opacity="0.5" />
-            <circle
-              cx="70"
-              cy="70"
-              r="60"
-              fill="none"
-              stroke="url(#grad)"
-              strokeWidth="4"
-              strokeDasharray={377}
-              strokeDashoffset={377 - (prestigeProgress / 100) * 377}
-              strokeLinecap="round"
-              style={{ transform: 'rotate(-90deg)', transformOrigin: '70px 70px', transition: 'stroke-dashoffset 0.5s' }}
-            />
-            <defs>
-              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#a855f7" />
-                <stop offset="100%" stopColor="#ec4899" />
-              </linearGradient>
-            </defs>
-            <text x="70" y="78" textAnchor="middle" fill="#a855f7" fontSize="28" fontWeight="bold">◉</text>
-          </svg>
-          <div className="text-3xl font-bold text-white text-center">{prestigeProgress.toFixed(1)}%</div>
-          <div className="text-xs uppercase tracking-widest text-slate-500 text-center mt-2">Prestige Progress</div>
-          <div className="text-xs text-purple-300 text-center mt-3 mb-4">+37.8% Next Prestige</div>
           <button
-            onClick={() => {
-              if (state.level >= prestigeData.nextReq) {
-                dispatch({ type: 'PRESTIGE' })
-              }
-            }}
-            className="w-full px-4 py-2 bg-gradient-to-r from-purple-600/80 to-purple-700/80 border border-purple-500/50 rounded-lg font-bold text-sm hover:from-purple-600 hover:to-purple-700 transition"
+            onClick={() => setShowQuests(true)}
+            className="w-full mt-3 pt-3 border-t border-purple-400/15 text-[11px] uppercase tracking-[0.2em] text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1"
           >
-            Prestige ◉
+            View All Quests <span>›</span>
           </button>
-        </div>
+        </Panel>
+
+        {/* ===== Bottom-center: Active Bonuses ===== */}
+        <Panel className="absolute left-1/2 -translate-x-1/2 bottom-5 px-8 py-4 z-20">
+          <div className="text-center text-[11px] uppercase tracking-[0.25em] text-slate-400 mb-3">Active Bonuses</div>
+          <div className="flex gap-8">
+            {activeBonuses.map((b, i) => (
+              <div key={i} className="text-center">
+                <div className={`text-xl ${b.color}`}>{b.icon}</div>
+                <div className={`text-lg font-bold ${b.color} mt-1`}>
+                  +{(b.value * 100).toFixed(b.label === 'Crit Chance' ? 1 : 0)}%
+                </div>
+                <div className="text-[10px] uppercase tracking-wider text-slate-500 mt-0.5">{b.label}</div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
+        {/* ===== Bottom-right: Prestige Progress ===== */}
+        <Panel className="absolute right-6 bottom-5 px-6 py-4 z-20 flex items-center gap-5">
+          {/* Ring */}
+          <div className="relative w-28 h-28 shrink-0">
+            <svg width="112" height="112" className="-rotate-90">
+              <circle cx="56" cy="56" r="48" fill="none" stroke="#241640" strokeWidth="6" />
+              <circle
+                cx="56"
+                cy="56"
+                r="48"
+                fill="none"
+                stroke="url(#prestigeGrad)"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 48}
+                strokeDashoffset={2 * Math.PI * 48 * (1 - prestigePercent / 100)}
+                style={{ transition: 'stroke-dashoffset 0.5s ease', filter: 'drop-shadow(0 0 6px rgba(192,38,211,0.6))' }}
+              />
+              <defs>
+                <linearGradient id="prestigeGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#a855f7" />
+                  <stop offset="100%" stopColor="#ec4899" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <ApexLogo size={30} color="#c084fc" />
+            </div>
+          </div>
+
+          {/* Text + button */}
+          <div className="leading-tight">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-purple-300/80">Prestige Progress</div>
+            <div className="text-3xl font-bold text-white">{prestigePercent.toFixed(1)}%</div>
+            <div className="text-[11px] text-purple-300/70 mt-1">
+              +{nextPrestigeRemaining.toFixed(1)}% Next Prestige
+            </div>
+            <button
+              onClick={() => canPrestige && dispatch({ type: 'PRESTIGE' })}
+              disabled={!canPrestige}
+              className={`mt-3 px-5 py-2 rounded-lg text-sm font-semibold tracking-wider flex items-center gap-2 transition-all ${
+                canPrestige
+                  ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white'
+                  : 'bg-purple-900/40 border border-purple-400/20 text-slate-500 cursor-not-allowed'
+              }`}
+            >
+              PRESTIGE <span>↻</span>
+            </button>
+          </div>
+        </Panel>
+
+        {/* Debug toggle */}
+        <button
+          onClick={() => setShowDebug(!showDebug)}
+          className="absolute top-6 left-1/2 -translate-x-1/2 z-20 bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg opacity-60 hover:opacity-100 transition"
+          title="Debug"
+        >
+          🔧
+        </button>
       </div>
 
-      {/* Debug Button */}
-      <button
-        onClick={() => setShowDebug(!showDebug)}
-        className="fixed top-24 left-4 z-40 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg text-sm opacity-75 hover:opacity-100"
-      >
-        🔧
-      </button>
-
-      {/* MODALS */}
+      {/* ===================== MODALS ===================== */}
       {showShop && <HeroShop state={state} dispatch={dispatch} onClose={() => setShowShop(false)} />}
       {showUpgrades && <HeroUpgrades state={state} dispatch={dispatch} onClose={() => setShowUpgrades(false)} />}
       {showSkins && <SkinShop state={state} dispatch={dispatch} onClose={() => setShowSkins(false)} />}
@@ -388,9 +453,9 @@ export default function GameScreenMockup() {
       {showDebug && <DebugPanel state={state} dispatch={dispatch} onClose={() => setShowDebug(false)} />}
       {showMenu && (
         <MenuModal
-          onSelectStats={() => { setShowMenu(false); setShowStats(true); }}
-          onSelectBattlePass={() => { setShowMenu(false); setShowBattlePass(true); }}
-          onSelectEvents={() => { setShowMenu(false); setShowEvents(true); }}
+          onSelectStats={() => { setShowMenu(false); setShowStats(true) }}
+          onSelectBattlePass={() => { setShowMenu(false); setShowBattlePass(true) }}
+          onSelectEvents={() => { setShowMenu(false); setShowEvents(true) }}
           onClose={() => setShowMenu(false)}
         />
       )}
