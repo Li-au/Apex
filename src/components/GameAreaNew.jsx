@@ -65,32 +65,37 @@ export default function GameAreaNew({
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-8 px-8">
+    <div className="w-full h-full flex flex-col items-center justify-center relative">
       {/* Boss Name and Title */}
-      <div className="text-center">
-        <div className="text-3xl font-bold text-white uppercase tracking-widest mb-2">
+      <div className="text-center mb-8">
+        <div className="text-4xl font-bold text-white uppercase tracking-[0.3em] mb-1">
           {bossStyle.name}
         </div>
-        <div className="text-xs text-slate-400 uppercase tracking-wider">Boss</div>
+        <div className="text-xs text-slate-500 uppercase tracking-widest font-light">Boss</div>
       </div>
 
       {/* Health Bar */}
-      <div className="w-96">
-        <div className="bg-red-600/20 border border-red-600 rounded-lg h-3 overflow-hidden">
+      <div className="w-96 mb-12">
+        <div className="bg-red-900/30 border-2 border-red-600/60 rounded-lg h-4 overflow-hidden shadow-lg shadow-red-600/20">
           <div
-            className="h-full bg-gradient-to-r from-red-600 to-red-500 transition-all duration-100"
+            className="h-full bg-gradient-to-r from-red-600 via-red-500 to-red-400 transition-all duration-100 shadow-inner"
             style={{ width: `${healthPercent}%` }}
           />
         </div>
-        <div className="text-xs text-slate-400 text-center mt-2">
+        <div className="text-xs text-slate-500 text-center mt-3 font-light">
           {Math.floor(bossHealth).toLocaleString()} / {Math.floor(maxHealth).toLocaleString()} HP
         </div>
       </div>
 
-      {/* Boss Display with Tap Zone */}
-      <div className="relative h-80 flex items-center justify-center">
+      {/* Boss Display Container */}
+      <div className="relative w-full h-96 flex items-center justify-center mb-8">
+        {/* Background Gradient Glow */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-80 h-80 bg-gradient-to-b from-purple-600/40 via-purple-500/20 to-purple-600/40 rounded-full blur-3xl opacity-50" />
+        </div>
+
         {/* Boss Emoji */}
-        <div className="text-8xl animate-bounce mb-12">
+        <div className="text-9xl animate-bounce relative z-10 drop-shadow-2xl">
           {bossStyle.emoji}
         </div>
 
@@ -98,36 +103,44 @@ export default function GameAreaNew({
         <button
           ref={tapZoneRef}
           onClick={handleTap}
-          className="absolute w-64 h-64 rounded-full border-2 border-purple-400/50 hover:border-purple-300 transition-all transform hover:scale-105 active:scale-95 duration-100 cursor-pointer flex items-center justify-center"
+          className="absolute w-72 h-72 rounded-full border-2 border-purple-400/60 hover:border-purple-300/80 transition-all transform hover:scale-110 active:scale-95 duration-150 cursor-pointer flex items-center justify-center bg-gradient-to-b from-purple-500/5 to-transparent"
         >
-          <div className="text-center">
+          <div className="text-center z-20">
             <div className="text-2xl font-light text-purple-300 uppercase tracking-widest">TAP</div>
-            <div className="text-xs text-purple-400 uppercase tracking-wider mt-2">TO ATTACK</div>
-            <div className="text-2xl mt-3">▼</div>
+            <div className="text-xs text-purple-400 uppercase tracking-wider mt-3 font-light">TO ATTACK</div>
+            <div className="text-3xl text-purple-400 mt-4 animate-bounce" style={{ animationDelay: '0.2s' }}>▼</div>
           </div>
 
           {/* Floating Damage Numbers */}
-          {floatingDamage.map(({ id, x, y, damage }) => (
-            <div
-              key={id}
-              className="damage-number text-amber-400 font-bold pointer-events-none"
-              style={{
-                left: `${x}px`,
-                top: `${y}px`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              +{damage.toFixed(0)}
-            </div>
-          ))}
+          {floatingDamage.map(({ id, x, y, damage }) => {
+            const random = Math.random();
+            const labels = ['CRITICAL!', 'GODLIKE!', '+'];
+            const label = random > 0.8 ? labels[0] : random > 0.6 ? labels[1] : labels[2];
+            const colors = random > 0.8 ? 'text-cyan-400' : random > 0.6 ? 'text-rose-400' : 'text-amber-400';
+
+            return (
+              <div
+                key={id}
+                className={`damage-number ${colors} font-bold pointer-events-none text-lg drop-shadow-lg`}
+                style={{
+                  left: `${x}px`,
+                  top: `${y}px`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              >
+                <div>{label}</div>
+                <div className="text-sm">{damage.toFixed(0)}</div>
+              </div>
+            );
+          })}
         </button>
       </div>
 
       {/* Damage Info */}
-      <div className="text-center text-sm text-slate-400">
-        <div>+{Math.floor(totalDamage)} Damage per tap</div>
+      <div className="text-center text-sm text-slate-400 font-light">
+        <div className="text-lg text-white">+{Math.floor(totalDamage)} Damage</div>
         {(prestigeMultiplier > 1 || ascensionMultiplier > 1) && (
-          <div className="mt-2 space-y-1 text-xs">
+          <div className="mt-3 space-y-1 text-xs">
             {prestigeMultiplier > 1 && (
               <div className="text-violet-400">×{prestigeMultiplier.toFixed(2)} Prestige</div>
             )}
