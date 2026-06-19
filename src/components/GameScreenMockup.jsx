@@ -6,6 +6,7 @@ import { getHeroDamage } from '../data/heroes'
 import { calculateTalentBonuses } from '../data/talents'
 import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
 import ApexLogo from './ApexLogo'
+import BossArt from './BossArt'
 import HeroShop from './HeroShop'
 import SkinShop from './SkinShop'
 import HeroUpgrades from './HeroUpgrades'
@@ -109,18 +110,20 @@ export default function GameScreenMockup() {
   const getBossStyle = () => {
     if (isSpecialEventLevel(state.level)) {
       const event = getEventAtLevel(state.level)
-      if (event) return { emoji: event.boss, name: event.name }
+      if (event) return { emoji: event.boss, name: event.name, img: 'titan' }
     }
     const variants = {
-      common: { emoji: '👹', name: 'Goblin' },
-      rare: { emoji: '🧟', name: 'Zombie' },
-      epic: { emoji: '🧛', name: 'Vampire' },
-      legendary: { emoji: '👹', name: 'Demon' },
+      common: { emoji: '👹', name: 'Goblin', img: 'goblin' },
+      rare: { emoji: '🧟', name: 'Zombie', img: 'zombie' },
+      epic: { emoji: '🧛', name: 'Vampire', img: 'vampire' },
+      legendary: { emoji: '👹', name: 'Demon', img: 'demon' },
     }
     const levelData = getLevelData(state.level)
     return variants[levelData?.variant || 'common']
   }
   const boss = getBossStyle()
+  // Real boss image (served from /public/bosses/). Falls back to emoji on error.
+  const bossImgUrl = boss.img ? `${import.meta.env.BASE_URL}bosses/${boss.img}.png` : null
   const healthPercent = (state.bossHealth / state.maxHealth) * 100
   const levelProgress = Math.max(0, Math.min(100, (1 - state.bossHealth / state.maxHealth) * 100))
 
@@ -284,9 +287,9 @@ export default function GameScreenMockup() {
               {/* Glow */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
 
-              {/* Boss emoji */}
-              <div className="absolute top-[60px] left-1/2 -translate-x-1/2 text-[120px] leading-none drop-shadow-[0_0_35px_rgba(168,85,247,0.55)] animate-bounce pointer-events-none">
-                {boss.emoji}
+              {/* Boss image (real art with emoji fallback) */}
+              <div className="absolute top-[40px] left-1/2 -translate-x-1/2 pointer-events-none">
+                <BossArt src={bossImgUrl} emoji={boss.emoji} size={220} />
               </div>
 
               {/* Floating damage (right of boss) */}
