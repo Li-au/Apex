@@ -132,6 +132,9 @@ export default function GameScreen() {
           onTap={handleTap}
           floatingDamage={floatingDamage}
           activeSkin={state.activeSkin}
+          heroCount={state.heroCount}
+          prestigeMultiplier={state.prestigeMultiplier}
+          ascensionMultiplier={state.ascensionMultiplier}
         />
       </div>
 

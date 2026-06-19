@@ -2,8 +2,9 @@ import { useRef } from 'react'
 import { getLevelData } from '../data/levels'
 import { SKINS } from '../data/skins'
 import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
+import { getHeroDamage } from '../data/heroes'
 
-export default function GameArea({ level, bossHealth, maxHealth, onTap, floatingDamage, activeSkin }) {
+export default function GameArea({ level, bossHealth, maxHealth, onTap, floatingDamage, activeSkin, heroCount, prestigeMultiplier, ascensionMultiplier }) {
   const tapZoneRef = useRef(null)
   const healthPercent = (bossHealth / maxHealth) * 100
   const levelData = getLevelData(level)
@@ -48,6 +49,15 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
 
   const activeSkinData = SKINS.find(s => s.id === activeSkin) || SKINS[0]
 
+  // Calculate total damage
+  let totalDamage = 1 * prestigeMultiplier
+  if (heroCount) {
+    Object.entries(heroCount).forEach(([heroId, count]) => {
+      const heroDamage = getHeroDamage(parseInt(heroId))
+      totalDamage += heroDamage * count * prestigeMultiplier * ascensionMultiplier
+    })
+  }
+
   return (
     <div className="w-full max-w-2xl flex flex-col items-center justify-center gap-3">
       {/* Boss Display */}
@@ -89,6 +99,7 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
               {activeSkinData.emoji}
             </div>
             <div className="text-white font-bold text-lg">TAP!</div>
+            <div className="text-slate-300 text-sm mt-2">+{Math.floor(totalDamage)} Damage</div>
           </div>
         </div>
 
