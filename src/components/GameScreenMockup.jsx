@@ -110,13 +110,13 @@ export default function GameScreenMockup() {
   const getBossStyle = () => {
     if (isSpecialEventLevel(state.level)) {
       const event = getEventAtLevel(state.level)
-      if (event) return { emoji: event.boss, name: event.name, img: 'titan' }
+      if (event) return { emoji: event.boss, name: 'Void Titan', img: 'titan' }
     }
     const variants = {
-      common: { emoji: '👹', name: 'Goblin', img: 'titan' },
-      rare: { emoji: '🧟', name: 'Zombie', img: 'titan' },
-      epic: { emoji: '🧛', name: 'Vampire', img: 'titan' },
-      legendary: { emoji: '👹', name: 'Demon', img: 'titan' },
+      common: { emoji: '👹', name: 'Void Titan', img: 'titan' },
+      rare: { emoji: '🧟', name: 'Void Titan', img: 'titan' },
+      epic: { emoji: '🧛', name: 'Void Titan', img: 'titan' },
+      legendary: { emoji: '👹', name: 'Void Titan', img: 'titan' },
     }
     const levelData = getLevelData(state.level)
     return variants[levelData?.variant || 'common']
