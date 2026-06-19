@@ -113,10 +113,10 @@ export default function GameScreenMockup() {
       if (event) return { emoji: event.boss, name: event.name, img: 'titan' }
     }
     const variants = {
-      common: { emoji: '👹', name: 'Goblin', img: 'goblin' },
-      rare: { emoji: '🧟', name: 'Zombie', img: 'zombie' },
-      epic: { emoji: '🧛', name: 'Vampire', img: 'vampire' },
-      legendary: { emoji: '👹', name: 'Demon', img: 'demon' },
+      common: { emoji: '👹', name: 'Goblin', img: 'titan' },
+      rare: { emoji: '🧟', name: 'Zombie', img: 'titan' },
+      epic: { emoji: '🧛', name: 'Vampire', img: 'titan' },
+      legendary: { emoji: '👹', name: 'Demon', img: 'titan' },
     }
     const levelData = getLevelData(state.level)
     return variants[levelData?.variant || 'common']
@@ -288,8 +288,8 @@ export default function GameScreenMockup() {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
 
               {/* Boss image (real art with emoji fallback) */}
-              <div className="absolute top-[40px] left-1/2 -translate-x-1/2 pointer-events-none">
-                <BossArt src={bossImgUrl} emoji={boss.emoji} size={220} />
+              <div className="absolute top-[30px] left-1/2 -translate-x-1/2 pointer-events-none">
+                <BossArt src={bossImgUrl} emoji={boss.emoji} size={280} />
               </div>
 
               {/* Floating damage (right of boss) */}
