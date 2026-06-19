@@ -285,11 +285,11 @@ export default function GameScreenMockup() {
                 <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
               </div>
               {/* Glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
 
               {/* Boss image (real art with emoji fallback) */}
-              <div className="absolute top-[30px] left-1/2 -translate-x-1/2 pointer-events-none">
-                <BossArt src={bossImgUrl} emoji={boss.emoji} size={280} />
+              <div className="absolute top-[10px] left-1/2 -translate-x-1/2 pointer-events-none">
+                <BossArt src={bossImgUrl} emoji={boss.emoji} size={380} />
               </div>
 
               {/* Floating damage (right of boss) */}
