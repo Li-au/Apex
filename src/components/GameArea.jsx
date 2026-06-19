@@ -100,6 +100,18 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
             </div>
             <div className="text-white font-bold text-lg">TAP!</div>
             <div className="text-slate-300 text-sm mt-2">+{Math.floor(totalDamage)} Damage</div>
+
+            {/* Multipliers Display */}
+            {(prestigeMultiplier > 1 || ascensionMultiplier > 1) && (
+              <div className="text-xs text-slate-400 mt-3 space-y-1">
+                {prestigeMultiplier > 1 && (
+                  <div className="text-violet-400">×{prestigeMultiplier.toFixed(2)} Prestige</div>
+                )}
+                {ascensionMultiplier > 1 && (
+                  <div className="text-red-400">×{ascensionMultiplier.toFixed(2)} Ascension</div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
