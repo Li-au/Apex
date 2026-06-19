@@ -1,9 +1,9 @@
-import GameScreenNew from './components/GameScreenNew'
+import GameScreenMockup from './components/GameScreenMockup'
 
 function App() {
   return (
     <div className="w-full h-screen">
-      <GameScreenNew />
+      <GameScreenMockup />
     </div>
   )
 }
