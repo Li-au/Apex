@@ -4,8 +4,13 @@ import { getLevelData, LEVELS } from '../data/levels'
 import { SKINS, getSkinTapBoost } from '../data/skins'
 import { getHeroDamage } from '../data/heroes'
 import { getEventAtLevel, isSpecialEventLevel } from '../data/specialEvents'
-import GameHeader from './GameHeader'
-import GameArea from './GameArea'
+import GameHeaderNew from './GameHeaderNew'
+import GameAreaNew from './GameAreaNew'
+import LeftSidebarNew from './LeftSidebarNew'
+import RightSidebarNew from './RightSidebarNew'
+import BottomLeftNew from './BottomLeftNew'
+import BottomCenterNew from './BottomCenterNew'
+import BottomRightNew from './BottomRightNew'
 import HeroShop from './HeroShop'
 import SkinShop from './SkinShop'
 import HeroUpgrades from './HeroUpgrades'
@@ -109,8 +114,15 @@ export default function GameScreen() {
     }, 1000)
   }
 
+  // Calculate prestige progress
+  const prestigeData = state.prestige > 0 ? {
+    currentReq: 20 + (state.prestige - 1) * 5,
+    nextReq: 20 + state.prestige * 5,
+  } : { currentReq: 20, nextReq: 20 }
+  const prestigeLevelProgress = ((state.level - prestigeData.currentReq) / (prestigeData.nextReq - prestigeData.currentReq)) * 100
+
   return (
-    <div className="w-full h-full flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="w-full h-full bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 flex flex-col">
       {/* Header */}
       <GameHeader
         level={state.level}

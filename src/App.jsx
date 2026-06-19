@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
-import GameScreen from './components/GameScreen'
+import GameScreenNew from './components/GameScreenNew'
 
 function App() {
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-slate-900 to-slate-800">
-      <GameScreen />
+    <div className="w-full h-screen">
+      <GameScreenNew />
     </div>
   )
 }
