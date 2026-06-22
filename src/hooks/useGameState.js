@@ -235,6 +235,8 @@ const gameReducer = (state, action) => {
         level: targetLevel,
         bossHealth: newMaxHealth,
         maxHealth: newMaxHealth,
+        // Also advance prestige progress so Prestige/Ascend become testable after a jump
+        prestigeProgress: Math.min(targetLevel, state.prestigeRequirement),
       }
     }
 

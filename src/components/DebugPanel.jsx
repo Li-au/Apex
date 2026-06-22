@@ -12,17 +12,8 @@ export default function DebugPanel({ state, dispatch, onClose }) {
   }
 
   const handleJumpLevel = (level) => {
-    console.log('Jumping to level:', level)
-    try {
-      // Jump in steps to avoid any issues
-      for (let i = state.level + 1; i <= level; i += 10) {
-        dispatch({ type: 'NEXT_LEVEL' })
-      }
-      dispatch({ type: 'SET_LEVEL', payload: level })
-    } catch (e) {
-      console.error('Jump error:', e)
-    }
-    setTimeout(() => onClose(), 100)
+    dispatch({ type: 'SET_LEVEL', payload: level })
+    onClose()
   }
 
   const handleUnlockHeroes = () => {
