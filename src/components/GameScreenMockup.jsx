@@ -253,84 +253,78 @@ export default function GameScreenMockup() {
           <SideButton emoji="☰" label="Menu" ring="border-cyan-400/50 group-hover:border-cyan-300 group-hover:bg-cyan-500/10" dot="bg-cyan-400" dotSide="left" onClick={() => setShowMenu(true)} />
         </div>
 
-        {/* Center boss stage */}
-        <div className="absolute inset-0 flex flex-col items-center pt-4">
-          {/* Boss title */}
+        {/* ===== Boss composition (layered so a large titan stays clean) ===== */}
+        {/* Glow (background) */}
+        <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] max-w-[80vw] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none z-0" />
+
+        {/* Orbital ring (background) */}
+        <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] max-w-[82vw] max-h-[82vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none z-0">
+          <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
+          <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
+        </div>
+
+        {/* Boss image (background, behind the UI) */}
+        <div className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-full pointer-events-none z-0">
+          <BossArt src={bossImgUrl} emoji={boss.emoji} width={760} />
+        </div>
+
+        {/* Title + health bar (overlay, always on top of the boss) */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center z-20 pointer-events-none">
           <div className="flex items-center gap-4 mb-3">
             <span className="text-purple-400/40 text-sm">◇ ──────</span>
-            <h2 className="text-3xl font-bold tracking-[0.35em] text-white uppercase">{boss.name}</h2>
+            <h2 className="text-3xl font-bold tracking-[0.35em] text-white uppercase drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">{boss.name}</h2>
             <span className="text-purple-400/40 text-sm">────── ◇</span>
           </div>
-
-          {/* Health bar */}
           <div className="w-[420px] max-w-[60vw]">
-            <div className="h-2.5 rounded-full bg-slate-800/80 overflow-hidden border border-red-500/20">
+            <div className="h-2.5 rounded-full bg-slate-800/80 overflow-hidden border border-red-500/20 shadow-lg shadow-black/40">
               <div
                 className="h-full bg-gradient-to-r from-red-600 to-rose-500 transition-all duration-100"
                 style={{ width: `${healthPercent}%` }}
               />
             </div>
-            <div className="text-center text-sm text-rose-300/90 mt-2 tracking-wide">
+            <div className="text-center text-sm text-rose-300/90 mt-2 tracking-wide drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]">
               <span className="text-rose-400 font-semibold">{fmt(state.bossHealth)}</span>
               <span className="text-slate-500"> / {fmt(state.maxHealth)} HP</span>
             </div>
           </div>
-
-          {/* Boss + tap (fixed-size unit, lifted above bottom panels) */}
-          <div className="relative flex-1 w-full flex items-center justify-center pb-48">
-            <div className="relative w-[420px] h-[420px] max-w-[80vw]">
-              {/* Orbital ring */}
-              <div className="absolute inset-0 rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none">
-                <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
-                <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
-              </div>
-              {/* Glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
-
-              {/* Boss image (trimmed) - bottom arc seated on the TAP button's rounded top */}
-              <div className="absolute bottom-[160px] left-1/2 -translate-x-1/2 pointer-events-none">
-                <BossArt src={bossImgUrl} emoji={boss.emoji} width={1200} />
-              </div>
-
-              {/* Floating damage (right of boss) */}
-              <div className="absolute left-[78%] top-[70px] w-48 h-72 pointer-events-none">
-                {floaters.map((f) => {
-                  const styles = {
-                    normal: 'text-cyan-300 text-xl',
-                    critical: 'text-amber-300 text-3xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]',
-                    godlike: 'text-fuchsia-400 text-3xl drop-shadow-[0_0_12px_rgba(232,121,249,0.7)]',
-                  }
-                  return (
-                    <div
-                      key={f.id}
-                      className={`damage-number font-bold ${styles[f.tier]}`}
-                      style={{ top: `${f.top}px`, left: `${f.left}px` }}
-                    >
-                      {f.tier !== 'normal' && (
-                        <div className="text-sm tracking-widest uppercase">
-                          {f.tier === 'godlike' ? 'Godlike!' : 'Critical!'}
-                        </div>
-                      )}
-                      <div>+{Math.floor(f.dmg).toLocaleString()}</div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Tap circle */}
-              <button
-                onClick={handleTap}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
-              >
-                <div className="text-center">
-                  <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
-                  <div className="text-[11px] tracking-[0.25em] text-purple-300/80 mt-1">TO ATTACK</div>
-                  <div className="text-purple-300/70 mt-2 animate-bounce">⌄</div>
-                </div>
-              </button>
-            </div>
-          </div>
         </div>
+
+        {/* Floating damage (overlay) */}
+        <div className="absolute left-[57%] top-[26%] w-48 h-72 pointer-events-none z-20">
+          {floaters.map((f) => {
+            const styles = {
+              normal: 'text-cyan-300 text-xl',
+              critical: 'text-amber-300 text-3xl drop-shadow-[0_0_10px_rgba(251,191,36,0.6)]',
+              godlike: 'text-fuchsia-400 text-3xl drop-shadow-[0_0_12px_rgba(232,121,249,0.7)]',
+            }
+            return (
+              <div
+                key={f.id}
+                className={`damage-number font-bold ${styles[f.tier]}`}
+                style={{ top: `${f.top}px`, left: `${f.left}px` }}
+              >
+                {f.tier !== 'normal' && (
+                  <div className="text-sm tracking-widest uppercase">
+                    {f.tier === 'godlike' ? 'Godlike!' : 'Critical!'}
+                  </div>
+                )}
+                <div>+{Math.floor(f.dmg).toLocaleString()}</div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Tap button (overlay, above the boss, arc seated on its rounded top) */}
+        <button
+          onClick={handleTap}
+          className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-[20px] w-40 h-40 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
+        >
+          <div className="text-center">
+            <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
+            <div className="text-[11px] tracking-[0.25em] text-purple-300/80 mt-1">TO ATTACK</div>
+            <div className="text-purple-300/70 mt-2 animate-bounce">⌄</div>
+          </div>
+        </button>
 
         {/* ===== Bottom-left: Daily Quests ===== */}
         <Panel className="absolute left-6 bottom-5 w-72 p-4 z-20">
