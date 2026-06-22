@@ -254,18 +254,18 @@ export default function GameScreenMockup() {
         </div>
 
         {/* ===== Boss composition (layered so a large titan stays clean) ===== */}
-        {/* Glow (background) */}
-        <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] max-w-[80vw] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none z-0" />
+        {/* Glow (background) - centered on the boss/tap composition */}
+        <div className="absolute left-1/2 top-[50%] -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] max-w-[80vw] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none z-0" />
 
-        {/* Orbital ring (background) */}
-        <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] max-w-[82vw] max-h-[82vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none z-0">
+        {/* Orbital ring (background) - centered on the boss/tap composition */}
+        <div className="absolute left-1/2 top-[50%] -translate-x-1/2 -translate-y-1/2 w-[460px] h-[460px] max-w-[82vw] max-h-[82vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none z-0">
           <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
           <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
         </div>
 
         {/* Boss image (background, behind the UI) */}
         <div className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-full pointer-events-none z-0">
-          <BossArt src={bossImgUrl} emoji={boss.emoji} width={760} />
+          <BossArt src={bossImgUrl} emoji={boss.emoji} width={520} />
         </div>
 
         {/* Title + health bar (overlay, always on top of the boss) */}
