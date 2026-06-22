@@ -254,11 +254,11 @@ export default function GameScreenMockup() {
         </div>
 
         {/* ===== Boss composition (layered so a large titan stays clean) ===== */}
-        {/* Glow (background) - centered on the page */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] max-w-[80vw] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none z-0" />
+        {/* Glow (background) - original position (just above the titan's base) */}
+        <div className="absolute left-1/2 top-[calc(60%_-_50px)] -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] max-w-[80vw] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none z-0" />
 
-        {/* Orbital ring (background) - centered on the page */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[460px] h-[460px] max-w-[82vw] max-h-[82vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none z-0">
+        {/* Orbital ring (background) - original position (just above the titan's base) */}
+        <div className="absolute left-1/2 top-[calc(60%_-_50px)] -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] max-w-[80vw] max-h-[80vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none z-0">
           <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
           <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
         </div>
