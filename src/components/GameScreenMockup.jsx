@@ -253,19 +253,33 @@ export default function GameScreenMockup() {
           <SideButton emoji="☰" label="Menu" ring="border-cyan-400/50 group-hover:border-cyan-300 group-hover:bg-cyan-500/10" dot="bg-cyan-400" dotSide="left" onClick={() => setShowMenu(true)} />
         </div>
 
-        {/* ===== Boss composition (layered so a large titan stays clean) ===== */}
-        {/* Glow (background) - original position (just above the titan's base) */}
-        <div className="absolute left-1/2 top-[calc(60%_-_50px)] -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] max-w-[80vw] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none z-0" />
+        {/* ===== Boss composition: one centered unit so orbit/glow/titan/tap stay concentric ===== */}
+        <div className="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] max-w-[88vw] z-0">
+          {/* Glow (inset so the pulse animation can't shift it off-center) */}
+          <div className="absolute inset-[16px] rounded-full bg-purple-600/30 blur-3xl animate-glow-pulse pointer-events-none" />
 
-        {/* Orbital ring (background) - original position (just above the titan's base) */}
-        <div className="absolute left-1/2 top-[calc(60%_-_50px)] -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] max-w-[80vw] max-h-[80vw] rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none z-0">
-          <span className="absolute -top-1 left-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
-          <span className="absolute top-1/2 -right-1 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
-        </div>
+          {/* Orbital ring (inset so the spin animation can't shift it off-center) */}
+          <div className="absolute inset-0 rounded-full border border-purple-400/15 animate-spin-slow pointer-events-none">
+            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-300/60" />
+            <span className="absolute top-1/2 -right-1 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-fuchsia-300/50" />
+          </div>
 
-        {/* Boss image (background, behind the UI) */}
-        <div className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-full pointer-events-none z-0">
-          <BossArt src={bossImgUrl} emoji={boss.emoji} width={520} />
+          {/* Titan (behind the UI), bottom arc seated on the TAP button */}
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-[150px] pointer-events-none">
+            <BossArt src={bossImgUrl} emoji={boss.emoji} width={500} />
+          </div>
+
+          {/* Tap button (above the titan, at the bottom of the ring) */}
+          <button
+            onClick={handleTap}
+            className="absolute left-1/2 -translate-x-1/2 bottom-0 w-40 h-40 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
+          >
+            <div className="text-center">
+              <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
+              <div className="text-[11px] tracking-[0.25em] text-purple-300/80 mt-1">TO ATTACK</div>
+              <div className="text-purple-300/70 mt-2 animate-bounce">⌄</div>
+            </div>
+          </button>
         </div>
 
         {/* Title + health bar (overlay, always on top of the boss) */}
@@ -313,18 +327,6 @@ export default function GameScreenMockup() {
             )
           })}
         </div>
-
-        {/* Tap button (overlay, above the boss, arc seated on its rounded top) */}
-        <button
-          onClick={handleTap}
-          className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-[20px] w-40 h-40 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
-        >
-          <div className="text-center">
-            <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
-            <div className="text-[11px] tracking-[0.25em] text-purple-300/80 mt-1">TO ATTACK</div>
-            <div className="text-purple-300/70 mt-2 animate-bounce">⌄</div>
-          </div>
-        </button>
 
         {/* ===== Bottom-left: Daily Quests ===== */}
         <Panel className="absolute left-6 bottom-5 w-72 p-4 z-20">
