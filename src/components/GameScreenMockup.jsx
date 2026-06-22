@@ -289,7 +289,7 @@ export default function GameScreenMockup() {
 
               {/* Boss image (trimmed) - bottom arc seated on the TAP button's rounded top */}
               <div className="absolute bottom-[160px] left-1/2 -translate-x-1/2 pointer-events-none">
-                <BossArt src={bossImgUrl} emoji={boss.emoji} width={560} />
+                <BossArt src={bossImgUrl} emoji={boss.emoji} width={680} />
               </div>
 
               {/* Floating damage (right of boss) */}
