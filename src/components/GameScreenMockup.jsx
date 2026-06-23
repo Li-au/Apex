@@ -328,46 +328,8 @@ export default function GameScreenMockup() {
           })}
         </div>
 
-        {/* ===== Bottom-left: Daily Quests ===== */}
-        <Panel className="absolute left-6 bottom-5 w-72 p-4 z-20">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs uppercase tracking-[0.2em] text-slate-300 font-semibold">Daily Quests</span>
-            <span className="text-[11px] text-slate-500 flex items-center gap-1">🕐 {hrs}h {mins}m</span>
-          </div>
-          <div className="space-y-3">
-            {state.dailyQuests.slice(0, 3).map((q, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full border border-amber-400/40 flex items-center justify-center text-sm shrink-0">
-                  {q.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-slate-200 truncate">{q.name}</div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex-1 h-1 bg-slate-700/70 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-amber-500 to-amber-300"
-                        style={{ width: `${Math.min((q.current / q.target) * 100, 100)}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] text-slate-500 whitespace-nowrap">
-                      {fmt(q.current || 0)} / {fmt(q.target)}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-xs font-bold text-cyan-300 whitespace-nowrap shrink-0">{q.reward}✨</div>
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={() => setShowQuests(true)}
-            className="w-full mt-3 pt-3 border-t border-purple-400/15 text-[11px] uppercase tracking-[0.2em] text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1"
-          >
-            View All Quests <span>›</span>
-          </button>
-        </Panel>
-
-        {/* ===== Bottom-center: Active Bonuses ===== */}
-        <Panel className="absolute left-1/2 -translate-x-1/2 bottom-5 px-8 py-4 z-20">
+        {/* ===== Bottom-left: Active Bonuses ===== */}
+        <Panel className="absolute left-6 bottom-5 px-8 py-4 z-20">
           <div className="text-center text-[11px] uppercase tracking-[0.25em] text-slate-400 mb-3">Active Bonuses</div>
           <div className="flex gap-8">
             {activeBonuses.map((b, i) => (
