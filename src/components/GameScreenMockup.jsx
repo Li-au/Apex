@@ -272,7 +272,7 @@ export default function GameScreenMockup() {
           {/* Tap button (above the titan, at the bottom of the ring) */}
           <button
             onClick={handleTap}
-            className="absolute left-1/2 -translate-x-1/2 bottom-0 w-40 h-40 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
+            className="absolute left-1/2 -translate-x-1/2 bottom-0 w-56 h-56 rounded-full border border-purple-300/50 bg-gradient-to-b from-purple-500/15 to-transparent backdrop-blur-[1px] flex items-center justify-center transition-transform duration-100 hover:scale-105 active:scale-95 hover:border-purple-200/70 z-10"
           >
             <div className="text-center">
               <div className="text-2xl font-light tracking-[0.3em] text-white">TAP</div>
