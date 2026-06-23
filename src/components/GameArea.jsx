@@ -61,7 +61,7 @@ export default function GameArea({ level, bossHealth, maxHealth, onTap, floating
   return (
     <div className="w-full max-w-2xl flex flex-col items-center justify-center gap-3">
       {/* Boss Display */}
-      <div className="text-6xl animate-bounce">
+      <div className="text-9xl animate-bounce mt-8">
         {bossStyle.emoji}
       </div>
 
