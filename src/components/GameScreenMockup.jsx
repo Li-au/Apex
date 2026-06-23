@@ -87,10 +87,21 @@ export default function GameScreenMockup() {
     return () => clearInterval(t)
   }, [])
 
+  // Skin auto-unlock based on level
+  useEffect(() => {
+    SKINS.forEach(skin => {
+      if (skin.unlockLevel && state.level >= skin.unlockLevel && !state.unlockedSkins.includes(skin.id)) {
+        dispatch({ type: 'UNLOCK_SKIN', payload: skin.id })
+      }
+    })
+  }, [state.level])
+
   // Special event detection
   useEffect(() => {
-    const levelData = getLevelData(state.level)
-    if (levelData?.specialEvent) setCurrentEvent(levelData.specialEvent)
+    if (isSpecialEventLevel(state.level)) {
+      const event = getEventAtLevel(state.level)
+      if (event) setCurrentEvent(event)
+    }
   }, [state.level])
 
   // Boss completion -> next level (unchanged mechanic, wired here)

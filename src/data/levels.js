@@ -41,6 +41,6 @@ export const LEVELS = generateLevels()
 
 // Helper to get level data
 export function getLevelData(level) {
-  if (level < 1 || level > 50) return null
+  if (level < 1 || level > 200) return null
   return LEVELS[level - 1]
 }

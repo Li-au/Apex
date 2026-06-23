@@ -85,8 +85,12 @@ const gameReducer = (state, action) => {
       const newMaxHealth = Math.floor(100 * levelMultiplier)
       const newProgress = Math.min(state.prestigeProgress + 1, state.prestigeRequirement)
       const updatedQuestsForLevel = updateQuests(
-        updateQuests(state.dailyQuests, 'levels', 1),
-        'level_milestone',
+        updateQuests(
+          updateQuests(state.dailyQuests, 'levels', 1),
+          'level_milestone',
+          1
+        ),
+        'boss_kills',
         1
       )
       return {
