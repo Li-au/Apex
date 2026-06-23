@@ -265,7 +265,7 @@ export default function GameScreenMockup() {
           </div>
 
           {/* Titan (behind the UI), bottom arc seated on the TAP button */}
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-[150px] pointer-events-none">
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-[80px] pointer-events-none">
             <BossArt src={bossImgUrl} emoji={boss.emoji} width={700} />
           </div>
 
