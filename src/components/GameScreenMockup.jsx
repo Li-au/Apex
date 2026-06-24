@@ -108,8 +108,8 @@ export default function GameScreenMockup() {
   useEffect(() => {
     if (state.bossHealth === 0 && state.level < 200) {
       const levelData = getLevelData(state.level)
-      const reward = Math.floor((levelData?.reward || 0) * state.ascensionMultiplier)
-      const gems = levelData?.gemsReward || 0
+      const reward = Math.floor((levelData?.reward || 0) * state.ascensionMultiplier * (1 + talentBonuses.earningsMultiplier))
+      const gems = Math.floor((levelData?.gemsReward || 0) * (1 + talentBonuses.gemMultiplier))
       dispatch({ type: 'ADD_CURRENCY', payload: reward })
       dispatch({ type: 'ADD_GEMS', payload: gems })
       const tid = setTimeout(() => dispatch({ type: 'NEXT_LEVEL' }), 600)
@@ -138,14 +138,16 @@ export default function GameScreenMockup() {
   const healthPercent = (state.bossHealth / state.maxHealth) * 100
   const levelProgress = Math.max(0, Math.min(100, (1 - state.bossHealth / state.maxHealth) * 100))
 
+  const talentBonuses = calculateTalentBonuses(state.unlockedTalents)
+
   const damagePerTap = (() => {
     let total = 1 * state.prestigeMultiplier
     Object.entries(state.heroCount).forEach(([heroId, count]) => {
       const dmg = getHeroDamage(parseInt(heroId))
       const spd = state.heroSpeed[heroId] || 1.0
-      total += dmg * count * spd * state.prestigeMultiplier * state.ascensionMultiplier
+      total += dmg * count * spd * state.prestigeMultiplier * state.ascensionMultiplier * (1 + talentBonuses.heroDpsMultiplier)
     })
-    return total * (1 + getSkinTapBoost(state.activeSkin))
+    return total * (1 + getSkinTapBoost(state.activeSkin)) * (1 + talentBonuses.tapDamageMultiplier)
   })()
 
   const prestigePercent = Math.max(
@@ -154,8 +156,6 @@ export default function GameScreenMockup() {
   )
   const nextPrestigeRemaining = Math.max(0, 100 - prestigePercent)
   const canPrestige = state.prestigeProgress >= state.prestigeRequirement
-
-  const talentBonuses = calculateTalentBonuses(state.unlockedTalents)
   const activeBonuses = [
     { icon: '$', color: 'text-amber-400', value: talentBonuses.earningsMultiplier, label: 'Coins' },
     { icon: '◆', color: 'text-indigo-400', value: talentBonuses.gemMultiplier, label: 'Gems' },
