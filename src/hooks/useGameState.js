@@ -35,6 +35,8 @@ const INITIAL_STATE = {
   passiveDPSMultiplier: 1.0,
   // Talent tree system
   unlockedTalents: [],  // Array of talent IDs purchased
+  // Battle pass
+  claimedBattlePassTiers: [],
 }
 
 // Helper function to update quests based on their type
@@ -273,6 +275,22 @@ const gameReducer = (state, action) => {
         }
       }
       return state
+    }
+
+    case 'CLAIM_BATTLE_PASS_TIER': {
+      const { tier, coins, skinId } = action.payload
+      if (state.claimedBattlePassTiers.includes(tier)) return state
+      let newState = {
+        ...state,
+        claimedBattlePassTiers: [...(state.claimedBattlePassTiers || []), tier],
+      }
+      if (coins) newState.currency = newState.currency + coins
+      if (skinId !== undefined) {
+        newState.unlockedSkins = newState.unlockedSkins.includes(skinId)
+          ? newState.unlockedSkins
+          : [...newState.unlockedSkins, skinId].sort((a, b) => a - b)
+      }
+      return newState
     }
 
     case 'LOAD_GAME':

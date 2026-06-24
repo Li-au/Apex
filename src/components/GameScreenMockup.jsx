@@ -87,6 +87,13 @@ export default function GameScreenMockup() {
     return () => clearInterval(t)
   }, [])
 
+  // Reset daily quests at midnight
+  useEffect(() => {
+    dispatch({ type: 'RESET_DAILY_QUESTS' })
+    const t = setInterval(() => dispatch({ type: 'RESET_DAILY_QUESTS' }), 60000)
+    return () => clearInterval(t)
+  }, [])
+
   // Skin auto-unlock based on level
   useEffect(() => {
     SKINS.forEach(skin => {
@@ -433,7 +440,7 @@ export default function GameScreenMockup() {
           onClose={() => setShowMenu(false)}
         />
       )}
-      {showBattlePass && <BattlePass currentLevel={state.level} onClose={() => setShowBattlePass(false)} />}
+      {showBattlePass && <BattlePass currentLevel={state.level} state={state} dispatch={dispatch} onClose={() => setShowBattlePass(false)} />}
       {showEvents && (
         <EventsLeaderboard
           playerLevel={state.level}

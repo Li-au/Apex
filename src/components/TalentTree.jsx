@@ -11,6 +11,9 @@ export default function TalentTree({ state, dispatch, onClose }) {
     1: TALENTS.filter(t => t.tier === 1),
     2: TALENTS.filter(t => t.tier === 2),
     3: TALENTS.filter(t => t.tier === 3),
+    4: TALENTS.filter(t => t.tier === 4),
+    5: TALENTS.filter(t => t.tier === 5),
+    6: TALENTS.filter(t => t.tier === 6),
   }
 
   return (
@@ -36,12 +39,10 @@ export default function TalentTree({ state, dispatch, onClose }) {
         </div>
 
         <div className="p-6 space-y-6">
-          {[1, 2, 3].map(tier => (
+          {[1, 2, 3, 4, 5, 6].map(tier => (
             <div key={tier}>
               <div className="flex items-center gap-2 mb-3">
-                <div className="text-xl">
-                  {tier === 1 ? '⭐' : tier === 2 ? '⭐⭐' : '⭐⭐⭐'}
-                </div>
+                <div className="text-xl">{'⭐'.repeat(tier)}</div>
                 <h3 className="text-lg font-bold text-cyan-300">
                   Tier {tier} Talents
                 </h3>
