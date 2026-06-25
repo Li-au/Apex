@@ -15,8 +15,7 @@ export const SKINS = [
     description: 'Blazing attacks',
     unlocked: false,
     rarity: 'rare',
-    unlockLevel: 50,
-    tapDamageBoost: 0.15, // +15% tap damage
+    tapDamageBoost: 0.15,
   },
   {
     id: 2,
@@ -25,8 +24,7 @@ export const SKINS = [
     description: 'Frozen power',
     unlocked: false,
     rarity: 'rare',
-    unlockLevel: 60,
-    tapDamageBoost: 0.15, // +15% tap damage
+    tapDamageBoost: 0.15,
   },
   {
     id: 3,
@@ -45,8 +43,7 @@ export const SKINS = [
     description: 'Godly power',
     unlocked: false,
     rarity: 'legendary',
-    unlockLevel: 150,
-    tapDamageBoost: 0.50, // +50% tap damage
+    tapDamageBoost: 0.50,
   },
 ]
 

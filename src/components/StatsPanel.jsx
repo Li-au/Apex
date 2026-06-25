@@ -4,7 +4,7 @@ import { getPrestigeMultiplier } from '../data/prestige'
 export default function StatsPanel({ state, onClose }) {
   const totalHeroes = Object.values(state.heroCount).reduce((a, b) => a + b, 0)
   const totalUpgrades = Object.values(state.heroSpeed).filter(v => v > 1).length
-  const prestigeMultiplier = getPrestigeMultiplier(state.prestige)
+  const prestigeMultiplier = state.prestigeMultiplier
   const totalMultiplier = prestigeMultiplier * state.ascensionMultiplier
 
   return (

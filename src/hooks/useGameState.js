@@ -1,5 +1,6 @@
 import { useReducer, useEffect } from 'react'
 import { resetDailyQuests } from '../data/quests'
+import { TALENTS } from '../data/talents'
 
 const INITIAL_STATE = {
   level: 1,
@@ -41,8 +42,10 @@ const INITIAL_STATE = {
 
 // Helper function to update quests based on their type
 const updateQuests = (quests, questType, amount = 1) => {
+  let updated = false
   return quests.map(q => {
-    if (!q.completed && q.type === questType) {
+    if (!q.completed && q.type === questType && !updated) {
+      updated = true
       const newCurrent = Math.min(q.current + amount, q.target)
       return { ...q, current: newCurrent, completed: newCurrent >= q.target }
     }
@@ -256,8 +259,11 @@ const gameReducer = (state, action) => {
 
     case 'UNLOCK_TALENT': {
       const talentId = action.payload
-      const cost = action.cost
-      if (state.essences >= cost && !state.unlockedTalents.includes(talentId)) {
+      const cost = action.cost || 0
+      const talent = TALENTS.find(t => t.id === talentId)
+      if (!talent) return state
+      const tierUnlocked = talent.tier === 1 || TALENTS.some(t => t.tier === talent.tier - 1 && state.unlockedTalents.includes(t.id))
+      if (tierUnlocked && state.essences >= cost && !state.unlockedTalents.includes(talentId)) {
         return {
           ...state,
           essences: state.essences - cost,
@@ -314,9 +320,13 @@ export function useGameState() {
 
   // Load game state from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('apex-game-state')
-    if (saved) {
-      dispatch({ type: 'LOAD_GAME', payload: JSON.parse(saved) })
+    try {
+      const saved = localStorage.getItem('apex-game-state')
+      if (saved) {
+        dispatch({ type: 'LOAD_GAME', payload: JSON.parse(saved) })
+      }
+    } catch (e) {
+      localStorage.removeItem('apex-game-state')
     }
   }, [])
 

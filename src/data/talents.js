@@ -332,7 +332,3 @@ export function calculateTalentBonuses(talentIds) {
   return bonuses
 }
 
-export function getHeroDamage(talentId) {
-  const talent = TALENTS.find(t => t.id === talentId)
-  return talent?.effect?.heroDpsMultiplier || 0
-}

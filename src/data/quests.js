@@ -429,13 +429,12 @@ export const ALL_QUESTS = [
 
 export function getRandomQuests(count = 15) {
   const shuffled = [...ALL_QUESTS].sort(() => Math.random() - 0.5)
-  const seenTypes = new Set()
-  const unique = shuffled.filter(q => {
-    if (seenTypes.has(q.type)) return false
-    seenTypes.add(q.type)
-    return true
+  const typeCounts = {}
+  const selected = shuffled.filter(q => {
+    typeCounts[q.type] = (typeCounts[q.type] || 0) + 1
+    return typeCounts[q.type] <= 2
   })
-  return unique.slice(0, Math.min(count, unique.length)).map(q => ({
+  return selected.slice(0, Math.min(count, selected.length)).map(q => ({
     ...q,
     current: 0,
     completed: false,

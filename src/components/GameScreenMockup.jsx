@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useGameState } from '../hooks/useGameState'
 import { getLevelData } from '../data/levels'
 import { SKINS, getSkinTapBoost } from '../data/skins'
@@ -69,6 +69,7 @@ export default function GameScreenMockup() {
   const [floaters, setFloaters] = useState([])
   const [currentEvent, setCurrentEvent] = useState(null)
   const [now, setNow] = useState(Date.now())
+  const bossDeathHandled = useRef(false)
 
   const [showShop, setShowShop] = useState(false)
   const [showSkins, setShowSkins] = useState(false)
@@ -111,9 +112,11 @@ export default function GameScreenMockup() {
     }
   }, [state.level])
 
-  // Boss completion -> next level (unchanged mechanic, wired here)
+  // Boss completion -> next level
   useEffect(() => {
     if (state.bossHealth === 0) {
+      if (bossDeathHandled.current) return
+      bossDeathHandled.current = true
       const levelData = getLevelData(state.level)
       const bonuses = calculateTalentBonuses(state.unlockedTalents)
       const reward = Math.floor((levelData?.reward || 0) * state.ascensionMultiplier * (1 + bonuses.earningsMultiplier))
@@ -121,11 +124,16 @@ export default function GameScreenMockup() {
       dispatch({ type: 'ADD_CURRENCY', payload: reward })
       dispatch({ type: 'ADD_GEMS', payload: gems })
       if (state.level < 200) {
-        const tid = setTimeout(() => dispatch({ type: 'NEXT_LEVEL' }), 600)
+        const tid = setTimeout(() => {
+          dispatch({ type: 'NEXT_LEVEL' })
+          bossDeathHandled.current = false
+        }, 600)
         return () => clearTimeout(tid)
       }
+    } else {
+      bossDeathHandled.current = false
     }
-  }, [state.bossHealth, state.level, state.unlockedTalents, state.ascensionMultiplier])
+  }, [state.bossHealth, state.level])
 
   // ---- Derived values ----
   const getBossStyle = () => {
@@ -157,7 +165,7 @@ export default function GameScreenMockup() {
       const spd = state.heroSpeed[heroId] || 1.0
       total += dmg * count * spd * state.prestigeMultiplier * state.ascensionMultiplier * (1 + talentBonuses.heroDpsMultiplier)
     })
-    return total * (1 + getSkinTapBoost(state.activeSkin)) * (1 + talentBonuses.tapDamageMultiplier)
+    return total * (1 + getSkinTapBoost(state.activeSkin)) * (1 + talentBonuses.tapDamageMultiplier) * (1 + talentBonuses.tapSpeedMultiplier)
   })()
 
   const prestigePercent = Math.max(
