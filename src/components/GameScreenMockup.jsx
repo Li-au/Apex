@@ -113,15 +113,17 @@ export default function GameScreenMockup() {
 
   // Boss completion -> next level (unchanged mechanic, wired here)
   useEffect(() => {
-    if (state.bossHealth === 0 && state.level < 200) {
+    if (state.bossHealth === 0) {
       const levelData = getLevelData(state.level)
       const bonuses = calculateTalentBonuses(state.unlockedTalents)
       const reward = Math.floor((levelData?.reward || 0) * state.ascensionMultiplier * (1 + bonuses.earningsMultiplier))
       const gems = Math.floor((levelData?.gemsReward || 0) * (1 + bonuses.gemMultiplier))
       dispatch({ type: 'ADD_CURRENCY', payload: reward })
       dispatch({ type: 'ADD_GEMS', payload: gems })
-      const tid = setTimeout(() => dispatch({ type: 'NEXT_LEVEL' }), 600)
-      return () => clearTimeout(tid)
+      if (state.level < 200) {
+        const tid = setTimeout(() => dispatch({ type: 'NEXT_LEVEL' }), 600)
+        return () => clearTimeout(tid)
+      }
     }
   }, [state.bossHealth, state.level, state.unlockedTalents, state.ascensionMultiplier])
 

@@ -1,8 +1,13 @@
 import { TALENTS } from '../data/talents'
 
 export default function TalentTree({ state, dispatch, onClose }) {
+  const tierUnlocked = (tier) => {
+    if (tier === 1) return true
+    return TALENTS.filter(t => t.tier === tier - 1).some(t => state.unlockedTalents.includes(t.id))
+  }
+
   const handleUnlockTalent = (talent) => {
-    if (state.essences >= talent.cost && !state.unlockedTalents.includes(talent.id)) {
+    if (state.essences >= talent.cost && !state.unlockedTalents.includes(talent.id) && tierUnlocked(talent.tier)) {
       dispatch({ type: 'UNLOCK_TALENT', payload: talent.id, cost: talent.cost })
     }
   }
@@ -50,7 +55,8 @@ export default function TalentTree({ state, dispatch, onClose }) {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {groupedTalents[tier].map(talent => {
                   const isUnlocked = state.unlockedTalents.includes(talent.id)
-                  const canAfford = state.essences >= talent.cost && !isUnlocked
+                  const tierAvailable = tierUnlocked(talent.tier)
+                  const canAfford = tierAvailable && state.essences >= talent.cost && !isUnlocked
 
                   return (
                     <div
@@ -58,6 +64,8 @@ export default function TalentTree({ state, dispatch, onClose }) {
                       className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
                         isUnlocked
                           ? 'bg-green-900 border-green-500'
+                          : !tierAvailable
+                          ? 'bg-slate-900 border-slate-700 opacity-40'
                           : canAfford
                           ? 'bg-slate-700 border-cyan-500 hover:border-cyan-300'
                           : 'bg-slate-800 border-slate-600 opacity-60'

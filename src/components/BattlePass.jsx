@@ -12,7 +12,7 @@ const BATTLE_PASS_TIERS = [
 ]
 
 export default function BattlePass({ currentLevel, state, dispatch, onClose }) {
-  const progress = Math.min((currentLevel / 50) * 100, 100)
+  const progress = Math.min((currentLevel / 200) * 100, 100)
   const claimedTiers = state?.claimedBattlePassTiers || []
 
   const handleClaim = (item) => {

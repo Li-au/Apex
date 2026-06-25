@@ -43,7 +43,7 @@ export default function SkinShop({ state, dispatch, onClose }) {
                   )}
                   {!isUnlocked && (
                     <div className="text-xs text-slate-400">
-                      Unlock at L{skin.unlockLevel}
+                      {skin.unlockLevel ? `Unlock at L${skin.unlockLevel}` : 'Battle Pass Reward'}
                     </div>
                   )}
                 </div>

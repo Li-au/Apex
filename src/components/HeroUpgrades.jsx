@@ -55,7 +55,7 @@ export default function HeroUpgrades({ state, dispatch, onClose }) {
                 className="p-4 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 border-2 border-slate-600"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-3xl">{hero.emoji}</div>
+                  <div className="text-3xl">{hero.icon}</div>
                   <div className="text-right">
                     <div className="text-sm font-bold text-cyan-400">x{speed.toFixed(1)} Speed</div>
                     <div className="text-xs text-slate-400">Owned: {count}</div>

@@ -107,8 +107,8 @@ const gameReducer = (state, action) => {
 
     case 'BUY_HERO': {
       const heroId = action.payload
+      if (state.currency < action.heroCost) return state
       const count = state.heroCount[heroId] || 0
-      const totalHeroes = Object.values(state.heroCount).reduce((a, b) => a + b, 0)
       const updatedQuestsForHeroes = updateQuests(
         updateQuests(state.dailyQuests, 'heroes_bought', 1),
         'heroes_owned',
@@ -150,7 +150,6 @@ const gameReducer = (state, action) => {
       return state
 
     case 'ASCEND':
-      // Ultimate reset with PERMANENT bonuses
       return {
         ...state,
         level: 1,
@@ -163,8 +162,16 @@ const gameReducer = (state, action) => {
         heroSpeed: {},
         prestige: 0,
         prestigeMultiplier: 1,
+        prestigeProgress: 0,
+        prestigeRequirement: 20,
+        tapsCount: 0,
+        bossKills: 0,
+        currencyEarned: 0,
+        gemsEarned: 0,
+        dailyQuests: resetDailyQuests(),
+        questsCompletedToday: 0,
         ascensions: state.ascensions + 1,
-        ascensionMultiplier: state.ascensionMultiplier * 1.5,  // +50% permanent bonus
+        ascensionMultiplier: state.ascensionMultiplier * 1.5,
       }
 
     case 'SELECT_SKIN':
@@ -228,6 +235,7 @@ const gameReducer = (state, action) => {
           ...state,
           dailyQuests: resetDailyQuests(),
           lastQuestReset: today,
+          questsCompletedToday: 0,
         }
       }
       return state
@@ -294,7 +302,7 @@ const gameReducer = (state, action) => {
     }
 
     case 'LOAD_GAME':
-      return action.payload
+      return { ...INITIAL_STATE, ...action.payload }
 
     default:
       return state
